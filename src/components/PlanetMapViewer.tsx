@@ -458,7 +458,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           {
             minZoom: 12,
             maxZoom: 17,
-            attribution: '© GoogleMaps-Free',
+            attribution: '© Apple-Kul',
           },
         ).addTo(mapRef.current);
 
@@ -468,7 +468,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           {
             minZoom: 12,
             maxZoom: 17,
-            attribution: '© GoogleMaps-Free',
+            attribution: '© Apple-Kul',
             subdomains: 'abcd',
           },
         ).addTo(mapRef.current);
