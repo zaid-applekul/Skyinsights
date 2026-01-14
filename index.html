@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrchardIntel: Apple Disease Detector with Planet Climate Risk Advisor</title>
+    <meta name="description" content="Advanced AI-powered apple disease detection system. Upload apple leaf images for instant disease identification and treatment recommendations using CNN technology." />
+    <meta name="keywords" content="apple disease, plant pathology, AI detection, agriculture, CNN, machine learning" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="OrchardIntel: Apple Disease Detector with Planet Climate Risk Advisor" />
+    <meta property="og:description" content="Advanced AI-powered apple disease detection system for instant disease identification and treatment recommendations." />
+    <meta property="og:image" content="https://images.pexels.com/photos/1131458/pexels-photo-1131458.jpeg?auto=compress&cs=tinysrgb&w=1200" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="OrchardIntel: Apple Disease Detector with Planet Climate Risk Advisor" />
+    <meta name="twitter:description" content="Advanced AI-powered apple disease detection system for instant disease identification and treatment recommendations." />
+    <meta name="twitter:image" content="https://images.pexels.com/photos/1131458/pexels-photo-1131458.jpeg?auto=compress&cs=tinysrgb&w=1200" />
+    
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out;
+      }
+      
+      .animate-bounce {
+        animation: bounce 1s infinite;
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 53%, 80%, 100% {
+          animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+          transform: translate3d(0, 0, 0);
+        }
+        40%, 43% {
+          animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+          transform: translate3d(0, -8px, 0);
+        }
+        70% {
+          animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+          transform: translate3d(0, -4px, 0);
+        }
+        90% {
+          transform: translate3d(0, -1px, 0);
+        }
+      }
+      
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

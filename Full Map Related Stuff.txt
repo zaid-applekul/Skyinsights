@@ -1,0 +1,53 @@
+Getting the Long Planet API Key 
+
+$body = @{
+  grant_type    = 'client_credentials'
+  client_id     = '60711046-f780-4b75-b0df-90f8a6c9c330'
+  client_secret = 'QxckFgJPQGWFIDAKI43d1EcadTvVzYU8'
+}
+
+$response = Invoke-RestMethod `
+  -Method Post `
+  -Uri 'https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token' `
+  -ContentType 'application/x-www-form-urlencoded' `
+  -Body $body
+
+$response.access_token
+
+2) Forcing The New Code To Deploy in SupaBase
+npx supabase functions deploy planet-proxy \
+  --project-ref YOUR_PROJECT_REF \
+  --no-verify-jwt
+
+3) To Get XML Capabilities 
+
+YOUR_SUPABASE_URL/functions/v1/planet-proxy?REQUEST=GetCapabilities&SERVICE=WMTS
+
+4) The Test URL After 3rd Step 
+YOUR_SUPABASE_URL/functions/v1/planet-proxy
+?SERVICE=WMTS
+&REQUEST=GetTile
+&VERSION=1.0.0
+&LAYER=3_NDVI-L1C
+&STYLE=default
+&TILEMATRIXSET=PopularWebMercator512
+&TILEMATRIX=1
+&TILEROW=0
+&TILECOL=0
+&FORMAT=image/png
+
+5) Changes In Planet Map Viewer Code
+
+const base = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/planet-proxy`;
+
+const tplUrl =
+  `${base}?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0` +
+  `&LAYER=${layerName}` +
+  `&STYLE=default` + // your layers use "default"
+  `&TILEMATRIXSET=PopularWebMercator512` +
+  `&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}` +
+  `&FORMAT=image/png`;
+
+
+6) Use environment variables from your .env file for all configuration
+
