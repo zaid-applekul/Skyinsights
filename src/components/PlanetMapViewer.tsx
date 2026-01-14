@@ -455,7 +455,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
         baseLayerRef.current = L.tileLayer(
           'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           {
-            minZoom: 14,
+            minZoom: 12,
             maxZoom: 17,
             attribution: '© OpenStreetMap contributors',
           },
@@ -731,7 +731,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           opacity: 0.95,
           tileSize: 512,
           maxZoom: 17,
-          minZoom: 14,
+          minZoom: 12,
         });
 
         t.addTo(mapRef.current);
