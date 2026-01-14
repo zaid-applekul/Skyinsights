@@ -169,6 +169,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
   const baseLayerRef = useRef<any>(null);
+  const labelLayerRef = useRef<any>(null);
 
   // Drawing state
   const [drawingMode, setDrawingMode] = useState<'none' | 'line' | 'polygon' | 'rectangle'>('none');
