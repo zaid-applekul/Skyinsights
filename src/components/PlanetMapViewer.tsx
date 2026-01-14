@@ -452,15 +452,26 @@ export const PlanetMapViewer: React.FC<Props> = ({
           10,
         );
 
+        // ArcGIS World Imagery base layer
         baseLayerRef.current = L.tileLayer(
-          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
           {
             minZoom: 12,
             maxZoom: 17,
-            attribution: '© OpenStreetMap contributors',
+            attribution: '© GoogleMaps-Free',
           },
         ).addTo(mapRef.current);
 
+        // Carto labels overlay
+        labelLayerRef.current = L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png',
+          {
+            minZoom: 12,
+            maxZoom: 17,
+            attribution: '© GoogleMaps-Free',
+            subdomains: 'abcd',
+          },
+        ).addTo(mapRef.current);
         mapRef.current.on('click', (e: any) => {
           const mode = drawingModeRef.current;
           if (mode === 'none') {
@@ -728,7 +739,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           `&FORMAT=image/png`;
 
         const t = L.tileLayer(tplUrl, {
-          opacity: 0.95,
+          opacity: 1,
           tileSize: 512,
           maxZoom: 17,
           minZoom: 12,
