@@ -316,7 +316,7 @@ export default function ClimateRiskPredictor(): JSX.Element {
         <div className="flex items-center space-x-2">
           
           <span className="text-lg font-semibold text-green-900">
-             Satellite Crop AppleKul™ Insights
+             Dashboard
           </span>
         </div>
         <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
@@ -360,7 +360,7 @@ export default function ClimateRiskPredictor(): JSX.Element {
             : 'bg-green-600 text-white hover:bg-green-700'
         }`}
       >
-        {showClimateForm ? '✏️ Manual Mode' : '🤖 Automatic Mode'}
+        {showClimateForm ? 'Satellite Live Plus' : ' Satellite Live'}
       </button>
 
       {/* 2-column layout - hide left panel unless form is shown */}

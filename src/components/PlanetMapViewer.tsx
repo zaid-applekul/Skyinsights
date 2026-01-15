@@ -459,7 +459,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           {
             minZoom: 12,
             maxZoom: 17,
-            attribution: '© Apple-Kul',
+            attribution: '© AppleKul™',
           },
         ).addTo(mapRef.current);
 
@@ -469,7 +469,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           {
             minZoom: 12,
             maxZoom: 17,
-            attribution: '© Apple-Kul',
+            attribution: '© AppleKul™',
             subdomains: 'abcd',
           },
         ).addTo(mapRef.current);
