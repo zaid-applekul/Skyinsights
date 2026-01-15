@@ -49,7 +49,7 @@ function App() {
     useState<PredictionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] =
-    useState<'predict' | 'dataset' | 'train' | 'climate'>('predict');
+    useState<'predict' | 'dataset' | 'train' | 'climate'>('climate');
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
@@ -287,12 +287,11 @@ function App() {
 
       {/* widened: let content stretch more */}
       <main className="w-full max-w-7xl mx-auto px-4 py-8">
-        {/* Navigation Tabs - ONLY Disease & Climate VISIBLE - CENTERED */}
+        {/* Navigation Tabs - ONLY Climate Risk VISIBLE - CENTERED */}
         <div className="flex justify-center items-center mb-8">
           <div className="flex space-x-1 bg-white rounded-xl p-1 shadow-sm border border-green-200">
             {[
-              { id: 'predict', label: 'Disease Prediction', icon: Brain },
-              { id: 'climate', label: 'Climate Risk', icon: Info },
+              { id: 'climate', label: 'Satellite Crop Insights', icon: Info },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -494,29 +493,27 @@ function App() {
         <footer className="text-center py-8 text-gray-600 border-t border-green-200 mt-12">
           <div className="pt-8">
             <p className="text-sm">
-              🍃 <span className="font-semibold text-green-700">OrchardIntel</span>: Apple Disease Detector with Planet Climate Risk Advisor • Powered by Advanced Computer Vision •
-              For Educational and Research Purposes
+               <span className="font-semibold text-green-700">AppleKul™ Skyinsights</span>
+              
+            </p>
+            <p className="text-xs mt-2 text-gray-500">
+              Crop Intelligence Management
             </p>
             <p className="text-xs mt-2 text-gray-500">
               Always consult with agricultural professionals for critical crop
               decisions
             </p>
             <p className="text-xs mt-3 text-gray-500">
-              Built by <span className="font-semibold">Zaid Shabir</span> •{' '}
+              <span className="font-semibold"></span> {' '}
+              {' '}
+              {' '}
               <a
-                href="mailto:zaidshabir67@gmail.com"
-                className="text-green-600 hover:text-green-700 underline"
-              >
-                zaidshabir67@gmail.com
-              </a>{' '}
-              •{' '}
-              <a
-                href="https://github.com/Zai14"
+                href="https://www.applekul.com"
                 target="_blank"
                 rel="noreferrer"
                 className="text-green-600 hover:text-green-700 underline"
               >
-                github.com/Zai14
+                Copyright © 2026 Applekul™. All rights reserved.
               </a>
             </p>
           </div>

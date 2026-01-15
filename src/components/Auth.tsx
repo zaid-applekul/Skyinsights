@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { User, Lock, Mail, LogIn, UserPlus, CheckCircle, Apple, Leaf, Sparkles } from 'lucide-react';
 import { TermsAndConditions } from './TermsAndConditions';
 import { PrivacyPolicy } from './PrivacyPolicy';
+import logo from '../assets/logo.png';
 
 interface AuthProps {
   onAuthChange: (user: any) => void;
@@ -65,19 +66,19 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
       <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative z-10 border border-green-100">
         {/* Header with Branding */}
         <div className="text-center mb-8">
-          <div className="relative inline-block mb-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg transform hover:scale-110 transition-transform duration-300">
-              <Apple className="w-10 h-10 text-white" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
-              <Leaf className="w-5 h-5 text-green-700" />
-            </div>
+          <div className="flex justify-center mb-6">
+            <img 
+              src={logo} 
+              alt="AppleKul Logo" 
+              className="w-56 h-31 object-contain"
+            />
+           
           </div>
           
           <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-            OrchardIntel
+            AppleKul™ Skyinsights
           </h1>
-          <p className="text-sm text-gray-500 mb-1 font-medium">Apple Disease Detector & Climate Risk Advisor</p>
+          <p className="text-sm text-gray-500 mb-1 font-medium">Crop Intelligence Management</p>
           
           <div className="flex items-center justify-center space-x-2 mt-3">
             <div className={`h-1 w-12 rounded-full transition-all duration-300 ${isLogin ? 'bg-green-600' : 'bg-gray-300'}`}></div>
@@ -86,7 +87,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
           
           <p className="text-gray-600 mt-4 flex items-center justify-center space-x-2">
             <Sparkles className="w-4 h-4 text-green-500" />
-            <span>{isLogin ? 'Welcome back!' : 'Join the smart farming revolution'}</span>
+            <span>{isLogin ? '' : 'Join the smart farming revolution'}</span>
           </p>
         </div>
 
@@ -183,7 +184,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
             ) : (
               <>
                 {isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
-                <span>{isLogin ? 'Sign In to OrchardIntel' : 'Create Account'}</span>
+                <span>{isLogin ? 'Sign In to AppleKul™ Skyinsights' : 'Create Account'}</span>
               </>
             )}
           </button>
@@ -213,13 +214,10 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
         {/* Feature Pills */}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <div className="px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-medium flex items-center space-x-1">
-            <Leaf className="w-3 h-3" />
-            <span>AI Disease Detection</span>
+            
+            <span>Copyright © 2026 Applekul™ All rights reserved</span>
           </div>
-          <div className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium flex items-center space-x-1">
-            <Sparkles className="w-3 h-3" />
-            <span>Climate Risk Analysis</span>
-          </div>
+          
         </div>
       </div>
 

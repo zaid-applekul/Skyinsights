@@ -314,9 +314,9 @@ export default function ClimateRiskPredictor(): JSX.Element {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-green-200">
         <div className="flex items-center space-x-2">
-          <Cloud className="w-5 h-5 text-green-600" />
+          
           <span className="text-lg font-semibold text-green-900">
-            🌤️ Climate Risk Predictor
+             Satellite Crop AppleKul™ Insights
           </span>
         </div>
         <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Leaf, User, LogOut, MoreVertical, Database, TreePine, Apple, Stethoscope } from 'lucide-react';
+import logo from '../assets/logo2.png';
 
 interface HeaderProps {
   user?: any;
@@ -62,28 +63,31 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut, onMenuItemClick
         )}
         
         {/* Main Title */}
-        <div className="flex items-center justify-center space-x-4 mb-6">
-          <div className="relative transform hover:scale-110 transition-transform duration-300">
-            <Apple className="w-14 h-14 text-green-50 drop-shadow-lg" />
-            <Leaf className="w-7 h-7 text-green-200 absolute -top-2 -right-2 animate-pulse" />
-          </div>
+        <div className="flex flex-col items-center justify-center mb-6">
+          {/* Logo - Commented out for now */}
+          {/* <div className="flex justify-center mb-6">
+            <img 
+              src={logo} 
+              alt="AppleKul Logo" 
+              className="w-80 h-60 object-contain"
+            />
+          </div> */}
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-2xl" style={{
               textShadow: '0 2px 4px rgba(0,0,0,0.1), 0 4px 8px rgba(16, 185, 129, 0.2)'
             }}>
-              OrchardIntel
+             AppleKul™ Skyinsights
             </h1>
             <div className="flex items-center justify-center space-x-2 mt-1">
               <div className="h-px w-8 bg-green-200"></div>
-              <span className="text-green-100 text-sm font-medium tracking-wider">SMART FARMING</span>
+              <span className="text-green-100 text-sm font-medium tracking-wider"></span>
               <div className="h-px w-8 bg-green-200"></div>
             </div>
           </div>
-          <Stethoscope className="w-12 h-12 text-green-50 drop-shadow-lg transform hover:scale-110 transition-transform duration-300" />
         </div>
         
         <p className="text-center text-green-50 text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed mb-0 font-light">
-          🌿 AI-Powered Apple Disease Detection & Planet-Climate Risk Analysis 🌱
+           Smart Farming, Data Driven Decision 
         </p>
         
       </div>
