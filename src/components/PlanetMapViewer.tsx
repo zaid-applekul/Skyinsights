@@ -1324,7 +1324,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
               className="text-[11px] text-black-600 underline"
               onClick={() => setShowLayerDetails((v) => !v)}
             >
-              {showLayerDetails ? 'Hide Layers' : 'Additional Info'}
+              {showLayerDetails ? 'Hide Layers' : 'Systematic Layers Info'}
             </button>
           </div>
 
