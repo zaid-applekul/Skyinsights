@@ -70,7 +70,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
             <img 
               src={logo} 
               alt="AppleKul Logo" 
-              className="w-56 h-31 object-contain"
+              className="w-56 h-25 object-contain"
             />
            
           </div>

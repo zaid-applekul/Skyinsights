@@ -1,0 +1,54 @@
+const LAYER_DESCRIPTIONS: Record<string, string> = {
+  // Vegetation health & vigor
+  'EVI': 'Enhanced Vegetation Index. High values indicate dense, healthy vegetation; low values suggest stress, sparse cover, or disease.',
+  '3_NDVI-L1C': 'Normalized Difference Vegetation Index. Low NDVI can signal plant stress, disease, or poor growth.',
+  'OSAVI': 'Optimized Soil-Adjusted Vegetation Index. Useful for areas with exposed soil; higher values mean healthier crops.',
+  'SAVI': 'Soil-Adjusted Vegetation Index. Reduces soil brightness effects; higher values indicate better vegetation health.',
+  'MSAVI': 'Modified SAVI. Improves vegetation detection in early growth stages with exposed soil.',
+  'DVI': 'Difference Vegetation Index. Higher values indicate more vegetation biomass.',
+  'RVI': 'Ratio Vegetation Index. Higher ratios generally mean denser and healthier vegetation.',
+  'IPVI': 'Infrared Percentage Vegetation Index. Values closer to 1 indicate healthy vegetation.',
+  'TVI': 'Transformed Vegetation Index. Similar to NDVI but more sensitive in high biomass areas.',
+  'VIGREEN': 'Green Vegetation Index. Highlights green vegetation intensity and vigor.',
+  'GNDVI': 'Green NDVI. Sensitive to chlorophyll concentration and nitrogen status.',
+  'NDGI': 'Normalized Difference Greenness Index. Measures overall greenness of vegetation.',
+  'GLI': 'Green Leaf Index. Highlights leaf greenness and photosynthetic activity.',
+  'NGRDI': 'Normalized Green-Red Difference Index. Useful for assessing crop vigor using visible bands.',
+  'VARI': 'Visible Atmospherically Resistant Index. Estimates vegetation health using visible light only.',
+  'EXG': 'Excess Green Index. High values indicate strong green vegetation presence.',
+  'EXR': 'Excess Red Index. High values may indicate soil exposure, senescence, or stressed vegetation.',
+
+  // Chlorophyll & red-edge indices
+  'CIGREEN': 'Chlorophyll Index (Green). Higher values indicate higher chlorophyll and nitrogen content.',
+  'NDRE': 'Normalized Difference Red Edge Index. Detects early crop stress before visible symptoms.',
+  'RENDVI': 'Red Edge NDVI. Sensitive to chlorophyll content and crop maturity.',
+  'MCARI': 'Modified Chlorophyll Absorption Ratio Index. Highlights chlorophyll stress in crops.',
+  'TCARI': 'Transformed Chlorophyll Absorption Ratio Index. Improves chlorophyll stress detection.',
+  'MTCI': 'MERIS Terrestrial Chlorophyll Index. High values indicate high chlorophyll concentration.',
+  'SIPI': 'Structure Insensitive Pigment Index. Detects pigment changes caused by stress or disease.',
+
+  // Moisture & water stress
+  'MOISTURE-INDEX': 'Moisture Index. High values indicate high surface or vegetation moisture, increasing fungal disease risk.',
+  '5_MOISTURE-INDEX-L1C': 'Moisture Index (L1C). Used to assess crop water stress and irrigation needs.',
+  'NDMI': 'Normalized Difference Moisture Index. Lower values indicate water stress in vegetation.',
+  'LSWI': 'Land Surface Water Index. Sensitive to plant and soil moisture content.',
+  'WBI': 'Water Band Index. Detects water content in plant canopies.',
+  'NDWI': 'Normalized Difference Water Index. Highlights water bodies and plant water content.',
+  '7_NDWI-L1C': 'Water Index (L1C). Used to detect surface water and irrigation patterns.',
+
+  // Snow, soil & terrain
+  '8_NDSI-L1C': 'Normalized Difference Snow Index. High values indicate snow cover.',
+  'TSAVI': 'Transformed Soil-Adjusted Vegetation Index. Minimizes soil brightness effects.',
+  'WDVI': 'Weighted Difference Vegetation Index. Reduces soil background influence.',
+  'PVI': 'Perpendicular Vegetation Index. Separates vegetation from soil background.',
+
+  // Color composites (visual interpretation)
+  '1_TRUE-COLOR-L1C': 'True Color Image. Looks like natural human vision; useful for visual inspection.',
+  '2_FALSE-COLOR-L1C': 'False Color Image. Healthy vegetation appears red, making crop vigor easy to spot.',
+  '4_FALSE-COLOR-URBAN-L1C': 'Urban False Color. Highlights built-up areas and infrastructure.',
+  '2_TONEMAPPED-NATURAL-COLOR-L1C': 'Tone-mapped Natural Color. Enhanced contrast for better visual clarity.',
+  '6_SWIR-L1C': 'Short-Wave Infrared. Useful for detecting moisture stress, soil dryness, and burned areas.',
+
+  // Stress & senescence
+  'PSRI': 'Plant Senescence Reflectance Index. High values indicate aging, stress, or disease in crops.',
+};
