@@ -497,7 +497,7 @@ function App() {
               
             </p>
             <p className="text-xs mt-2 text-gray-500">
-              Crop Intelligence Management
+              Satellite Crop Intelligence Management
             </p>
             <p className="text-xs mt-2 text-gray-500">
               Always consult with agricultural professionals for critical crop

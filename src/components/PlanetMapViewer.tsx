@@ -1103,7 +1103,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
     }}
     className={`w-full px-3 py-2 rounded text-sm font-medium transition-colors
       ${dataFetchMode === 'point'
-        ? 'bg-blue-500 text-white hover:bg-blue-600'
+        ? 'bg-green-500 text-white hover:bg-green-600'
         : 'bg-green-500 text-white hover:bg-green-600'}`}
   >
     {dataFetchMode === 'point'

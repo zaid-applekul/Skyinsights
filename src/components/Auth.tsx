@@ -78,7 +78,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
             AppleKul™ Skyinsights
           </h1>
-          <p className="text-sm text-gray-500 mb-1 font-medium">Crop Intelligence Management</p>
+          <p className="text-sm text-gray-500 mb-1 font-medium">Satellite Crop Intelligence Management</p>
           
           <div className="flex items-center justify-center space-x-2 mt-3">
             <div className={`h-1 w-12 rounded-full transition-all duration-300 ${isLogin ? 'bg-green-600' : 'bg-gray-300'}`}></div>
@@ -104,7 +104,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 bg-gray-50 focus:bg-white"
-                placeholder="your.email@example.com"
+                placeholder="your.email@applekul.com"
                 required
               />
             </div>
