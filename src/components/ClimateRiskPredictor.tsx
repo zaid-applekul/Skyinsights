@@ -75,6 +75,66 @@ const diseasePreventionGuide: Record<string, string[]> = {
     'Remove branches with active oozing cankers',
   ],
 };
+// Pests
+const pestPreventionGuide: Record<string, string[]> = {
+  'Fruit Fly': [
+    'Use pheromone or bait traps',
+    'Remove fallen and infested fruits',
+    'Maintain orchard sanitation',
+    'Apply bait sprays when required',
+    'Harvest fruits on time',
+  ],
+  'Tent Caterpillar': [
+    'Remove and destroy egg masses',
+    'Prune affected branches early',
+    'Use biological control (Bt)',
+    'Encourage natural predators',
+    'Monitor trees during spring',
+  ],
+  'Fruit Borer': [
+    'Remove infested fruits regularly',
+    'Use pheromone traps',
+    'Apply recommended insecticides',
+    'Maintain orchard hygiene',
+    'Avoid fruit injuries',
+  ],
+  'European Red Mite': [
+    'Monitor mite population regularly',
+    'Avoid excessive pesticide use',
+    'Apply miticides when threshold exceeded',
+    'Encourage predatory mites',
+    'Maintain adequate irrigation',
+  ],
+  'San José Scale': [
+    'Apply dormant oil sprays',
+    'Prune and destroy infested branches',
+    'Use systemic insecticides if severe',
+    'Monitor crawler stage carefully',
+    'Maintain orchard sanitation',
+  ],
+  'Leaf Miner': [
+    'Remove affected leaves early',
+    'Use pheromone traps',
+    'Apply selective insecticides',
+    'Encourage beneficial insects',
+    'Avoid unnecessary spraying',
+  ],
+  'Woolly Apple Aphid': [
+    'Use resistant rootstocks',
+    'Encourage natural predators',
+    'Apply insecticidal soap or oil',
+    'Avoid excessive nitrogen',
+    'Monitor root and shoot colonies',
+  ],
+  'Green Apple Aphid': [
+    'Monitor young shoots regularly',
+    'Encourage lady beetles and lacewings',
+    'Use neem oil or soft insecticides',
+    'Avoid nitrogen overuse',
+    'Maintain plant vigor',
+  ],
+};
+
 
 export default function ClimateRiskPredictor(): JSX.Element {
   const [view, setView] = useState<View>('Diseases');
@@ -733,16 +793,17 @@ export default function ClimateRiskPredictor(): JSX.Element {
                     <div className="font-medium text-gray-700 mb-1.5">
                       💡 Prevention Tips:
                     </div>
-                    {(diseasePreventionGuide[r.name] || []).slice(0, 2).map((tip: string) => (
-                      <div key={tip} className="text-gray-600 mb-1 leading-tight">
-                        • {tip}
-                      </div>
-                    ))}
-                    {(diseasePreventionGuide[r.name] || []).length > 2 && (
-                      <div className="text-gray-500 text-[10px] mt-1.5 pt-1 border-t border-gray-100">
-                        +{diseasePreventionGuide[r.name].length - 2} more prevention strategies
-                      </div>
-                    )}
+                   
+{(view === 'Diseases' ? diseasePreventionGuide[r.name] : pestPreventionGuide[r.name] || []).slice(0, 2).map((tip: string) => (
+  <div key={tip} className="text-gray-600 mb-1 leading-tight">
+    • {tip}
+  </div>
+))}
+{((view === 'Diseases' ? diseasePreventionGuide[r.name] : pestPreventionGuide[r.name]) || []).length > 2 && (
+  <div className="text-gray-500 text-[10px] mt-1.5 pt-1 border-t border-gray-100">
+    +{(view === 'Diseases' ? diseasePreventionGuide[r.name] : pestPreventionGuide[r.name]).length - 2} more prevention strategies
+  </div>
+)}
                   </div>
                 )}
               </div>
