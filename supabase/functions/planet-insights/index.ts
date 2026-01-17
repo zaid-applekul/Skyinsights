@@ -18,6 +18,9 @@ type PlanetInsightsResponse = {
   soilMoisture?: number;
   canopyHumidity?: number;
   wetnessHours?: number;
+  rh?: number;
+  weeklyRainfall?: number;
+  leafWetness?: number;
 };
 
 const corsHeaders = {
