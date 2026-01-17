@@ -158,6 +158,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
       soilMoisture,
       canopyHumidity,
       wetnessHours,
+      // Add legacy field mappings for frontend compatibility
+      rh: relativeHumidity !== undefined ? Math.round(relativeHumidity) : undefined,
+      weeklyRainfall: rainfall !== undefined ? Math.round(rainfall * 7 * 10) / 10 : undefined, // Convert daily to weekly
+      leafWetness: wetnessHours,
     };
 
     console.log('✅ Returning climate data:', resp);
