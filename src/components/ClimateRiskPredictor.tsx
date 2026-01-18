@@ -143,27 +143,32 @@ export default function ClimateRiskPredictor(): JSX.Element {
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [showClimateForm, setShowClimateForm] = useState(false);
 
-  const [viewParams, setViewParams] = useState<any>({
-    temperature: undefined,
-    rh: undefined,
-    weeklyRainfall: undefined,
-    leafWetness: undefined,
-    windSpeed: undefined,
-    soilMoisture: undefined,
-    canopyHumidity: undefined,
-    dustLevel: 'unknown',
-    drainage: 'unknown',
-    hasStandingWater48h: false,
-    hasTempJump10C: false,
-    hadDroughtThenHeavyRain: false,
-  });
+ const [viewParams, setViewParams] = useState<any>({
+  temperature: 0,
+  rh: 0,
+  weeklyRainfall: 0,
+  leafWetness: 0,
+  windSpeed: 0,
+  soilMoisture: 0,
+  canopyHumidity: 0,
+  dustLevel: 'unknown',
+  drainage: 'unknown',
+  hasStandingWater48h: false,
+  hasTempJump10C: false,
+  hadDroughtThenHeavyRain: false,
+  latitude: 34.1,  // default if map not used yet
+  longitude: 74.8,
+});
 
   const [results, setResults] = useState<any[]>([]);
   const [farmHealthScore, setFarmHealthScore] = useState(85);
 
-  const handleChange = (k: string, value: any) => {
-    setViewParams((p) => ({ ...p, [k]: value }));
-  };
+ const handleChange = (key: string, value: any) => {
+  setViewParams((prev) => ({
+    ...prev,
+    [key]: typeof value === 'number' ? value : value ?? 0,
+  }));
+};
 
   // Calculate Farm Health Score based on climate & disease risks
   const calculateFarmHealth = (climateParams: any, diseaseResults: any[]) => {
@@ -240,109 +245,153 @@ export default function ClimateRiskPredictor(): JSX.Element {
     setFarmHealthScore(totalScore);
     return totalScore;
   };
+// PREDICT BUTTON
+// ------------------- HANDLE PREDICT -------------------
+const handlePredict = () => {
+  console.log('🔵 Live Predict clicked');
+  console.log('🧠 Current viewParams:', viewParams);
+  console.log('⚙️ Current riskModel:', riskModel);
 
-  const handlePredict = () => {
-    const paramsForRules: any = {
-      temperature: Number(viewParams.temperature),
-      rh: Number(viewParams.rh),
-      relativeHumidity: Number(viewParams.rh),
-      weeklyRainfall: Number(viewParams.weeklyRainfall),
-      rainfall: Number(viewParams.weeklyRainfall),
-      leafWetness: Number(viewParams.leafWetness),
-      wetnessHours: Number(viewParams.leafWetness),
-      windSpeed: Number(viewParams.windSpeed),
-      soilMoisture:
-        viewParams.soilMoisture !== undefined
-          ? Number(viewParams.soilMoisture)
-          : undefined,
-      canopyHumidity:
-        viewParams.canopyHumidity !== undefined
-          ? Number(viewParams.canopyHumidity)
-          : undefined,
-      dustLevel: viewParams.dustLevel,
-      drainage: viewParams.drainage,
-      hasStandingWater48h: !!viewParams.hasStandingWater48h,
-      hasTempJump10C: !!viewParams.hasTempJump10C,
-      hadDroughtThenHeavyRain: !!viewParams.hadDroughtThenHeavyRain,
-      mode: riskModel,
-    };
+  const isMeta = riskModel === 'meta';
 
+  // ---- HARD SAFE DEFAULTS (Meta will crash without these) ----
+  const safeView = {
+    ...viewParams,
+    dustLevel: viewParams.dustLevel ?? 'low',
+    drainage: viewParams.drainage ?? 'good',
+    hasStandingWater48h: !!viewParams.hasStandingWater48h,
+    hasTempJump10C: !!viewParams.hasTempJump10C,
+    hadDroughtThenHeavyRain: !!viewParams.hadDroughtThenHeavyRain,
+  };
+
+  console.log('🛡️ Safe viewParams used:', safeView);
+
+  const paramsForRules: any = {
+    temperature: Number(safeView.temperature || 0),
+    rh: Number(safeView.rh || 0),
+    relativeHumidity: Number(safeView.rh || 0),
+    weeklyRainfall: Number(safeView.weeklyRainfall || 0),
+    rainfall: Number(safeView.weeklyRainfall || 0),
+    leafWetness: Number(safeView.leafWetness || 0),
+    wetnessHours: Number(safeView.leafWetness || 0),
+    windSpeed: Number(safeView.windSpeed || 0),
+    soilMoisture: Number(safeView.soilMoisture || 0),
+    canopyHumidity: Number(safeView.canopyHumidity || 0),
+
+    // 🔴 NEVER UNDEFINED FOR META
+    dustLevel: safeView.dustLevel,
+    drainage: safeView.drainage,
+    mode: riskModel,
+
+    // 🔴 Meta expects numeric flags
+    hasStandingWater48h: isMeta ? (safeView.hasStandingWater48h ? 1 : 0) : 0,
+    hasTempJump10C: isMeta ? (safeView.hasTempJump10C ? 1 : 0) : 0,
+    hadDroughtThenHeavyRain: isMeta ? (safeView.hadDroughtThenHeavyRain ? 1 : 0) : 0,
+  };
+
+  console.log('🚀 Params sent to engine (Live):', paramsForRules);
+
+  try {
     const res =
       view === 'Diseases'
         ? calculateDiseaseRisks(paramsForRules as ClimateParams)
         : calculatePestRisks(paramsForRules as ClimateParams);
 
-    const resultsSliced = res.slice(0, 10);
-    setResults(resultsSliced);
+    console.log('📊 Engine result:', res);
 
-    // Calculate farm health based on climate and disease risks
-    calculateFarmHealth(paramsForRules, resultsSliced);
-  };
+    const sliced = res.slice(0, 10);
+    setResults(sliced);
+    calculateFarmHealth(paramsForRules, sliced);
+  } catch (err) {
+    console.error('❌ META LIVE CRASH PREVENTED', err);
+    setResults([]);
+  }
+};
 
- const handlePlanetAutoFill = (climate: any) => {
+// ------------------- HANDLE PLANET AUTO-FILL -------------------
+const handlePlanetAutoFill = (climate: any) => {
+  console.log('🟢 Planet autofill triggered with climate:', climate);
   setIsAutoFilling(true);
 
-  const weeklyRain =
+  // ---- Weekly rainfall calculation ----
+  const weeklyRainfall =
     climate.weeklyRainfall != null
-      ? climate.weeklyRainfall
+      ? Number(climate.weeklyRainfall)
       : climate.rainfall != null
-      ? climate.rainfall * 7
-      : undefined;
+      ? Number(climate.rainfall) * 7
+      : 0;
 
+  console.log('🌧️ Computed weeklyRainfall:', weeklyRainfall);
+
+  // ---- Update UI params (booleans stay booleans) ----
   const updatedParams = {
-    ...viewParams,
-    temperature: climate.temperature,
-    rh: climate.rh ?? climate.relativeHumidity,
-    weeklyRainfall: weeklyRain,
-    leafWetness: climate.leafWetness ?? climate.wetnessHours,
-    windSpeed: climate.windSpeed,
-    soilMoisture: climate.soilMoisture,
-    canopyHumidity: climate.canopyHumidity,
+    temperature: Number(climate.temperature ?? 0),
+    rh: Number(climate.rh ?? climate.relativeHumidity ?? 0),
+    weeklyRainfall,
+    leafWetness: Number(climate.leafWetness ?? climate.wetnessHours ?? 0),
+    windSpeed: Number(climate.windSpeed ?? 0),
+    soilMoisture: Number(climate.soilMoisture ?? 0),
+    canopyHumidity: Number(climate.canopyHumidity ?? 0),
+
+    dustLevel: viewParams.dustLevel ?? 'low',
+    drainage: viewParams.drainage ?? 'good',
+
+    // 🔒 advanced flags remain boolean in state
+    hasStandingWater48h: !!viewParams.hasStandingWater48h,
+    hasTempJump10C: !!viewParams.hasTempJump10C,
+    hadDroughtThenHeavyRain: !!viewParams.hadDroughtThenHeavyRain,
   };
 
+  console.log('📦 Updated viewParams from Planet:', updatedParams);
   setViewParams(updatedParams);
 
-  // Auto-predict after data is filled
+  // ---- Auto predict ----
   setTimeout(() => {
+    const isMeta = riskModel === 'meta';
+    console.log('⚙️ Auto-predict mode:', riskModel);
+
     const paramsForRules: any = {
-      temperature: Number(updatedParams.temperature),
-      rh: Number(updatedParams.rh),
-      relativeHumidity: Number(updatedParams.rh),
-      weeklyRainfall: Number(updatedParams.weeklyRainfall),
-      rainfall: Number(updatedParams.weeklyRainfall),
-      leafWetness: Number(updatedParams.leafWetness),
-      wetnessHours: Number(updatedParams.leafWetness),
-      windSpeed: Number(updatedParams.windSpeed),
-      soilMoisture:
-        updatedParams.soilMoisture !== undefined
-          ? Number(updatedParams.soilMoisture)
-          : undefined,
-      canopyHumidity:
-        updatedParams.canopyHumidity !== undefined
-          ? Number(updatedParams.canopyHumidity)
-          : undefined,
+      temperature: updatedParams.temperature,
+      rh: updatedParams.rh,
+      relativeHumidity: updatedParams.rh,
+      weeklyRainfall: updatedParams.weeklyRainfall,
+      rainfall: updatedParams.weeklyRainfall,
+      leafWetness: updatedParams.leafWetness,
+      wetnessHours: updatedParams.leafWetness,
+      windSpeed: updatedParams.windSpeed,
+      soilMoisture: updatedParams.soilMoisture,
+      canopyHumidity: updatedParams.canopyHumidity,
       dustLevel: updatedParams.dustLevel,
       drainage: updatedParams.drainage,
-      hasStandingWater48h: !!updatedParams.hasStandingWater48h,
-      hasTempJump10C: !!updatedParams.hasTempJump10C,
-      hadDroughtThenHeavyRain: !!updatedParams.hadDroughtThenHeavyRain,
       mode: riskModel,
+
+      // 🔴 Meta gets numbers only
+      hasStandingWater48h: isMeta ? (updatedParams.hasStandingWater48h ? 1 : 0) : 0,
+      hasTempJump10C: isMeta ? (updatedParams.hasTempJump10C ? 1 : 0) : 0,
+      hadDroughtThenHeavyRain: isMeta ? (updatedParams.hadDroughtThenHeavyRain ? 1 : 0) : 0,
     };
 
-    const res =
-      view === 'Diseases'
-        ? calculateDiseaseRisks(paramsForRules as ClimateParams)
-        : calculatePestRisks(paramsForRules as ClimateParams);
+    console.log('🚀 Params sent to engine (Planet):', paramsForRules);
 
-    const resultsSliced = res.slice(0, 10);
-    setResults(resultsSliced);
+    try {
+      const res =
+        view === 'Diseases'
+          ? calculateDiseaseRisks(paramsForRules as ClimateParams)
+          : calculatePestRisks(paramsForRules as ClimateParams);
 
-    // Calculate farm health
-    calculateFarmHealth(paramsForRules, resultsSliced);
+      console.log('📊 Engine result:', res);
+
+      const sliced = res.slice(0, 10);
+      setResults(sliced);
+      calculateFarmHealth(paramsForRules, sliced);
+    } catch (err) {
+      console.error('❌ Planet Meta calculation failed:', err);
+      setResults([]);
+    }
+
     setIsAutoFilling(false);
   }, 300);
 };
-
 
   const topResults = results.slice(0, 3);
   const highRiskCount = results.filter((r) => r.level === 'High').length;
@@ -751,95 +800,104 @@ export default function ClimateRiskPredictor(): JSX.Element {
       </div>
 
       {/* RESULTS SECTION - BOTTOM */}
-      {results.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          {/* Risk Summary */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
-              <div className="text-sm font-bold text-red-700">{highRiskCount}</div>
-              <div className="text-xs text-red-600">High Risk</div>
-            </div>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
-              <div className="text-sm font-bold text-yellow-700">
-                {mediumRiskCount}
-              </div>
-              <div className="text-xs text-yellow-600">Medium Risk</div>
-            </div>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-center">
-              <div className="text-sm font-bold text-green-700">
-                {results.filter((r) => r.level === 'Low').length}
-              </div>
-              <div className="text-xs text-green-600">Low Risk</div>
-            </div>
-          </div>
+{Array.isArray(results) && results.length > 0 ? (
+  <div className="mt-4 pt-4 border-t border-gray-200">
+    {/* Risk Summary */}
+    <div className="grid grid-cols-3 gap-2 mb-3">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
+        <div className="text-sm font-bold text-red-700">{highRiskCount}</div>
+        <div className="text-xs text-red-600">High Risk</div>
+      </div>
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
+        <div className="text-sm font-bold text-yellow-700">
+          {mediumRiskCount}
+        </div>
+        <div className="text-xs text-yellow-600">Medium Risk</div>
+      </div>
+      <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-center">
+        <div className="text-sm font-bold text-green-700">
+          {results.filter((r) => r.level === 'Low').length}
+        </div>
+        <div className="text-xs text-green-600">Low Risk</div>
+      </div>
+    </div>
 
-          {/* Results List */}
-          <div className="flex items-center space-x-2 mb-2">
-            <TrendingUp className="w-3.5 h-3.5 text-gray-600" />
-            <span className="text-xs font-semibold text-gray-700">
-              Top {Math.min(3, results.length)} Risk(s)
-            </span>
-          </div>
+    {/* Top Results */}
+    <div className="space-y-2 max-h-48 overflow-y-auto">
+      {results.slice(0, 3).map((r, idx) => {
+        const preventionTips =
+          (view === 'Diseases'
+            ? diseasePreventionGuide?.[r.name]
+            : pestPreventionGuide?.[r.name]) ?? [];
 
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {topResults.map((r, idx) => (
-              <div
-                key={r.name}
-                className="border border-gray-200 rounded-lg p-2.5 bg-gradient-to-r from-gray-50 to-white text-xs hover:shadow-sm transition-shadow"
+        return (
+          <div
+            key={`${r.name}-${idx}`}
+            className="border border-gray-200 rounded-lg p-3 bg-white text-xs"
+          >
+            {/* HEADER */}
+            <div className="flex justify-between items-center mb-1">
+              <div className="font-semibold text-gray-800">
+                #{idx + 1} {r.name}
+              </div>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  r.level === 'High'
+                    ? 'bg-red-100 text-red-700'
+                    : r.level === 'Medium'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-green-100 text-green-700'
+                }`}
               >
-                <div className="font-semibold flex items-center justify-between mb-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-500">#{idx + 1}</span>
-                    <span className="text-gray-800">{r.name}</span>
+                {r.level}
+              </span>
+            </div>
+
+            {/* SCORE */}
+            <div className="text-gray-600 mb-1">
+              📊 Score: <b>{Math.round(r.score)}%</b>
+            </div>
+
+            {/* MATCHED FACTORS */}
+            {Array.isArray(r.matchedFactors) && r.matchedFactors.length > 0 && (
+              <div className="text-[11px] text-gray-500 mb-2">
+                <b>Matched:</b> {r.matchedFactors.join(', ')}
+              </div>
+            )}
+
+            {/* PREVENTION TIPS */}
+            {preventionTips.length > 0 && (
+              <div className="mt-2 text-[11px] bg-gray-50 p-2 rounded border border-gray-100">
+                <div className="font-medium text-gray-700 mb-1">
+                  💡 Prevention Tips
+                </div>
+
+                {preventionTips.slice(0, 2).map((tip) => (
+                  <div key={tip} className="text-gray-600 mb-1 leading-tight">
+                    • {tip}
                   </div>
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                      r.level === 'High'
-                        ? 'bg-red-100 text-red-700'
-                        : r.level === 'Medium'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-green-100 text-green-700'
-                    }`}
-                  >
-                    {r.level}
-                  </span>
-                </div>
-                <div className="text-gray-600 mb-1">
-                  📊 Score: <span className="font-semibold">{r.score}</span>
-                </div>
-                {r.matchedFactors.length > 0 && (
-                  <div className="mt-2 text-[11px] text-gray-600 bg-white p-1.5 rounded border border-gray-100">
-                    <div className="font-medium text-gray-700 mb-1.5">
-                      💡 Prevention Tips:
-                    </div>
-                   
-{(view === 'Diseases' ? diseasePreventionGuide[r.name] : pestPreventionGuide[r.name] || []).slice(0, 2).map((tip: string) => (
-  <div key={tip} className="text-gray-600 mb-1 leading-tight">
-    • {tip}
-  </div>
-))}
-{((view === 'Diseases' ? diseasePreventionGuide[r.name] : pestPreventionGuide[r.name]) || []).length > 2 && (
-  <div className="text-gray-500 text-[10px] mt-1.5 pt-1 border-t border-gray-100">
-    +{(view === 'Diseases' ? diseasePreventionGuide[r.name] : pestPreventionGuide[r.name]).length - 2} more prevention strategies
-  </div>
-)}
+                ))}
+
+                {preventionTips.length > 2 && (
+                  <div className="text-gray-400 text-[10px] mt-1 pt-1 border-t border-gray-100">
+                    +{preventionTips.length - 2} more strategies
                   </div>
                 )}
               </div>
-            ))}
+            )}
           </div>
-        </div>
-      )}
-
-      {/* EMPTY STATE */}
-      {results.length === 0 && (
-        <div className="mt-4 text-center py-8 text-gray-500">
-          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-          <p className="text-xs font-medium">
-            Select parameters and click "Predict Risk" or use Planet data
-          </p>
-        </div>
-      )}
+        );
+      })}
+    </div>
+  </div>
+) : (
+  <div className="mt-4 text-center py-8 text-gray-500">
+    <AlertCircle className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+    <p className="text-xs font-medium">
+      Select parameters and click &quot;Predict Risk&quot; or use Planet data
+    </p>
+  </div>
+)}
     </div>
   );
 }
