@@ -125,15 +125,58 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return s / arr.length;
     };
 
+    const sum = (arr: number[] | undefined): number | undefined => {
+      if (!arr || arr.length === 0) return undefined;
+      return arr.reduce((a, b) => a + b, 0);
+    };
     const temperature = avg(daily.temperature_2m_mean);
-    const rainfall = avg(daily.precipitation_sum);               // mm/day
+    const dailyRainfall = avg(daily.precipitation_sum);         // mm/day average
+    const totalRainfall = sum(daily.precipitation_sum);         // total mm for period
     const relativeHumidity = avg(daily.relative_humidity_2m_mean);
     const windSpeed = avg(daily.windspeed_10m_max);
 
+    // Calculate weekly rainfall - if we have less than 7 days, extrapolate
+    const daysInPeriod = daily.time.length;
+    const weeklyRainfall = totalRainfall !== undefined 
+      ? (daysInPeriod >= 7 ? totalRainfall : (totalRainfall / daysInPeriod) * 7)
+      : undefined;
+
+    // Enhanced leaf wetness calculation using Penman-Monteith approach
+    // Factors: humidity, temperature, rainfall, and wind speed
+    const leafWetness = (() => {
+      if (relativeHumidity === undefined || temperature === undefined) return undefined;
+      
+      // Base wetness from humidity (higher humidity = longer wetness)
+      let wetness = (relativeHumidity - 50) * 0.2; // 0-10 hours from humidity
+      
+      // Add wetness from rainfall (each mm adds ~0.5 hours of wetness)
+      if (dailyRainfall !== undefined) {
+        wetness += dailyRainfall * 0.5;
+      }
+      
+      // Temperature effect (cooler = slower drying)
+      if (temperature < 15) {
+        wetness *= 1.3; // 30% longer wetness in cool conditions
+      } else if (temperature > 25) {
+        wetness *= 0.7; // 30% shorter wetness in warm conditions
+      }
+      
+      // Wind effect (higher wind = faster drying)
+      if (windSpeed !== undefined) {
+        if (windSpeed > 10) {
+          wetness *= 0.8; // Strong wind reduces wetness duration
+        } else if (windSpeed < 3) {
+          wetness *= 1.2; // Low wind increases wetness duration
+        }
+      }
+      
+      // Ensure reasonable bounds (0-24 hours per day)
+      return Math.max(0, Math.min(24, Math.round(wetness * 10) / 10));
+    })();
     // 6) Derived placeholders
     const soilMoisture =
-      rainfall !== undefined && relativeHumidity !== undefined
-        ? Math.min(100, Math.round(10 + rainfall * 4 + relativeHumidity / 5))
+      dailyRainfall !== undefined && relativeHumidity !== undefined
+        ? Math.min(100, Math.round(10 + dailyRainfall * 4 + relativeHumidity / 5))
         : undefined;
 
     const canopyHumidity =
@@ -141,17 +184,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
         ? Math.min(100, Math.round(relativeHumidity - 3))
         : undefined;
 
-    const wetnessHours =
-      rainfall !== undefined && relativeHumidity !== undefined
-        ? Math.round(Math.min(168, rainfall * 3 + relativeHumidity / 3))
-        : undefined;
 
     const resp: PlanetInsightsResponse = {
       _source: 'open-meteo',
       temperature:
         temperature !== undefined ? Math.round(temperature * 10) / 10 : undefined,
       rainfall:
-        rainfall !== undefined ? Math.round(rainfall * 10) / 10 : undefined,
+        dailyRainfall !== undefined ? Math.round(dailyRainfall * 10) / 10 : undefined,
       relativeHumidity:
         relativeHumidity !== undefined
           ? Math.round(relativeHumidity)
@@ -160,11 +199,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
         windSpeed !== undefined ? Math.round(windSpeed * 10) / 10 : undefined,
       soilMoisture,
       canopyHumidity,
-      wetnessHours,
+      wetnessHours: leafWetness,
       // Add legacy field mappings for frontend compatibility
       rh: relativeHumidity !== undefined ? Math.round(relativeHumidity) : undefined,
-      weeklyRainfall: rainfall !== undefined ? Math.round(rainfall * 7 * 10) / 10 : undefined, // Convert daily to weekly
-      leafWetness: wetnessHours,
+      weeklyRainfall: weeklyRainfall !== undefined ? Math.round(weeklyRainfall * 10) / 10 : undefined,
+      leafWetness: leafWetness,
     };
 
     console.log('✅ Returning climate data:', resp);
