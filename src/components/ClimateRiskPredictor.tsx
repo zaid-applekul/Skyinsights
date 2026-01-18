@@ -144,13 +144,13 @@ export default function ClimateRiskPredictor(): JSX.Element {
   const [showClimateForm, setShowClimateForm] = useState(false);
 
   const [viewParams, setViewParams] = useState<any>({
-    temperature: 20,
-    rh: 75,
-    weeklyRainfall: 10,
-    leafWetness: 4,
-    windSpeed: 5,
-    soilMoisture: 50,
-    canopyHumidity: 75,
+    temperature: undefined,
+    rh: undefined,
+    weeklyRainfall: undefined,
+    leafWetness: undefined,
+    windSpeed: undefined,
+    soilMoisture: undefined,
+    canopyHumidity: undefined,
     dustLevel: 'unknown',
     drainage: 'unknown',
     hasStandingWater48h: false,
@@ -279,51 +279,70 @@ export default function ClimateRiskPredictor(): JSX.Element {
     calculateFarmHealth(paramsForRules, resultsSliced);
   };
 
-  const handlePlanetAutoFill = (params: Partial<Record<string, any>>) => {
-    setIsAutoFilling(true);
-    setViewParams((p) => ({ ...p, ...params }));
+ const handlePlanetAutoFill = (climate: any) => {
+  setIsAutoFilling(true);
 
-    // Auto-predict after data is filled
-    setTimeout(() => {
-      const updatedParams = { ...viewParams, ...params };
-      const paramsForRules: any = {
-        temperature: Number(updatedParams.temperature),
-        rh: Number(updatedParams.rh),
-        relativeHumidity: Number(updatedParams.rh),
-        weeklyRainfall: Number(updatedParams.weeklyRainfall),
-        rainfall: Number(updatedParams.weeklyRainfall),
-        leafWetness: Number(updatedParams.leafWetness),
-        wetnessHours: Number(updatedParams.leafWetness),
-        windSpeed: Number(updatedParams.windSpeed),
-        soilMoisture:
-          updatedParams.soilMoisture !== undefined
-            ? Number(updatedParams.soilMoisture)
-            : undefined,
-        canopyHumidity:
-          updatedParams.canopyHumidity !== undefined
-            ? Number(updatedParams.canopyHumidity)
-            : undefined,
-        dustLevel: updatedParams.dustLevel,
-        drainage: updatedParams.drainage,
-        hasStandingWater48h: !!updatedParams.hasStandingWater48h,
-        hasTempJump10C: !!updatedParams.hasTempJump10C,
-        hadDroughtThenHeavyRain: !!updatedParams.hadDroughtThenHeavyRain,
-        mode: riskModel,
-      };
+  const weeklyRain =
+    climate.weeklyRainfall != null
+      ? climate.weeklyRainfall
+      : climate.rainfall != null
+      ? climate.rainfall * 7
+      : undefined;
 
-      const res =
-        view === 'Diseases'
-          ? calculateDiseaseRisks(paramsForRules as ClimateParams)
-          : calculatePestRisks(paramsForRules as ClimateParams);
-
-      const resultsSliced = res.slice(0, 10);
-      setResults(resultsSliced);
-
-      // Calculate farm health
-      calculateFarmHealth(paramsForRules, resultsSliced);
-      setIsAutoFilling(false);
-    }, 300);
+  const updatedParams = {
+    ...viewParams,
+    temperature: climate.temperature,
+    rh: climate.rh ?? climate.relativeHumidity,
+    weeklyRainfall: weeklyRain,
+    leafWetness: climate.leafWetness ?? climate.wetnessHours,
+    windSpeed: climate.windSpeed,
+    soilMoisture: climate.soilMoisture,
+    canopyHumidity: climate.canopyHumidity,
   };
+
+  setViewParams(updatedParams);
+
+  // Auto-predict after data is filled
+  setTimeout(() => {
+    const paramsForRules: any = {
+      temperature: Number(updatedParams.temperature),
+      rh: Number(updatedParams.rh),
+      relativeHumidity: Number(updatedParams.rh),
+      weeklyRainfall: Number(updatedParams.weeklyRainfall),
+      rainfall: Number(updatedParams.weeklyRainfall),
+      leafWetness: Number(updatedParams.leafWetness),
+      wetnessHours: Number(updatedParams.leafWetness),
+      windSpeed: Number(updatedParams.windSpeed),
+      soilMoisture:
+        updatedParams.soilMoisture !== undefined
+          ? Number(updatedParams.soilMoisture)
+          : undefined,
+      canopyHumidity:
+        updatedParams.canopyHumidity !== undefined
+          ? Number(updatedParams.canopyHumidity)
+          : undefined,
+      dustLevel: updatedParams.dustLevel,
+      drainage: updatedParams.drainage,
+      hasStandingWater48h: !!updatedParams.hasStandingWater48h,
+      hasTempJump10C: !!updatedParams.hasTempJump10C,
+      hadDroughtThenHeavyRain: !!updatedParams.hadDroughtThenHeavyRain,
+      mode: riskModel,
+    };
+
+    const res =
+      view === 'Diseases'
+        ? calculateDiseaseRisks(paramsForRules as ClimateParams)
+        : calculatePestRisks(paramsForRules as ClimateParams);
+
+    const resultsSliced = res.slice(0, 10);
+    setResults(resultsSliced);
+
+    // Calculate farm health
+    calculateFarmHealth(paramsForRules, resultsSliced);
+    setIsAutoFilling(false);
+  }, 300);
+};
+
 
   const topResults = results.slice(0, 3);
   const highRiskCount = results.filter((r) => r.level === 'High').length;
