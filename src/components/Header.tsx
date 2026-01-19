@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut, onMenuItemClick
   };
 
   return (
-    <header className="bg-gradient-to-r from-green-700 via-green-600 to-emerald-600 text-white py-8 px-4 shadow-lg">
+    <header className="bg-gradient-to-r from-[#06542A] via-[#0B6B38] to-[#128C4E] text-white py-8 px-4 shadow-lg">
       <div className="max-w-7xl mx-auto">
         {/* User Menu - Top Right Only */}
         {user && (
