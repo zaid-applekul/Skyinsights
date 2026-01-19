@@ -137,6 +137,142 @@ const pestPreventionGuide: Record<string, string[]> = {
 };
 
 
+// 1. Add recommended treatment maps (copy your lists here)
+const diseaseRecommendedTreatment: Record<string, string[]> = {
+  'Apple Scab': [
+    'Mancozeb 75% WP (2–2.5 g/L) at green tip stage',
+    'Myclobutanil / Hexaconazole (1 ml/L) during infection period',
+    'Urea 5% spray on fallen leaves (autumn) to reduce spores',
+    'Balanced NPK fertilization (avoid excess nitrogen)',
+    'Calcium nitrate foliar spray to strengthen leaf tissue',
+  ],
+  'Apple Leaf Blotch (Alternaria)': [
+    'Chlorothalonil (2 g/L) or Mancozeb (2 g/L)',
+    'Propiconazole / Difenoconazole during humid weather',
+    'Potassium nitrate (1%) foliar spray',
+    'Avoid excess nitrogen fertilizers',
+    'Apply micronutrients (Zn, B) if deficient',
+  ],
+  'Powdery Mildew': [
+    'Sulfur 80% WP (2 g/L)',
+    'Hexaconazole / Penconazole (1 ml/L)',
+    'Potassium bicarbonate spray (5 g/L)',
+    'Avoid high nitrogen fertilization',
+    'Apply calcium-based foliar sprays',
+  ],
+  'Brown Rot': [
+    'Carbendazim (1 g/L) or Tebuconazole (1 ml/L)',
+    'Captan spray before harvest',
+    'Boron foliar spray (0.2%) at flowering',
+    'Balanced NPK nutrition',
+    'Remove infected fruits and twigs',
+  ],
+  "Bull's-eye Rot": [
+    'Thiophanate-methyl (1 g/L) pre-harvest',
+    'Post-harvest fungicide dip (approved formulations)',
+    'Calcium chloride spray (0.3–0.5%)',
+    'Avoid fruit bruising during harvest',
+    'Proper cold storage sanitation',
+  ],
+  'Sooty Blotch': [
+    'Captan / Chlorothalonil sprays in summer',
+    'Potassium nitrate (1%)',
+    'Improve orchard aeration',
+    'Avoid excessive irrigation',
+    'Balanced nutrition program',
+  ],
+  'Flyspeck': [
+    'Mancozeb or Captan sprays',
+    'Summer fungicide coverage',
+    'Canopy thinning',
+    'Avoid prolonged leaf wetness',
+    'Calcium sprays for fruit quality',
+  ],
+  'Collar / Root Rot': [
+    'Metalaxyl / Fosetyl-Al soil drench',
+    'Improve drainage immediately',
+    'Apply Trichoderma-enriched compost',
+    'Avoid water stagnation',
+    'Use resistant rootstocks',
+  ],
+  'Necrotic Leaf Blotch (physiological)': [
+    'Calcium nitrate (0.5%) foliar spray',
+    'Potassium sulfate (1%) spray',
+    'Avoid sudden heavy irrigation',
+    'Correct nutrient imbalance',
+    'Reduce plant stress (heat/water)',
+  ],
+};
+
+const pestRecommendedTreatment: Record<string, string[]> = {
+  'Fruit Fly': [
+    'Protein bait + Spinosad spray',
+    'Methyl eugenol traps',
+    'Remove fallen fruits regularly',
+    'Potassium-rich fertilization',
+    'Avoid overripe fruit on trees',
+  ],
+  'Tent Caterpillar': [
+    'Bacillus thuringiensis (Bt) spray',
+    'Chlorpyrifos (only if severe)',
+    'Manual nest removal',
+    'Maintain tree vigor with balanced NPK',
+    'Encourage birds and predators',
+  ],
+  'Fruit Borer': [
+    'Emamectin benzoate (0.4 g/L)',
+    'Spinosad (0.3 ml/L)',
+    'Pheromone traps',
+    'Remove infested fruits',
+    'Avoid excess nitrogen',
+  ],
+  'European Red Mite': [
+    'Propargite / Fenazaquin spray',
+    'Wettable sulfur',
+    'Adequate irrigation to reduce stress',
+    'Avoid broad-spectrum insecticides',
+    'Apply potassium-based fertilizers',
+  ],
+  'San José Scale': [
+    'Dormant oil spray (2–3%)',
+    'Chlorpyrifos during crawler stage',
+    'Prune heavily infested branches',
+    'Apply organic compost',
+    'Monitor scale buildup',
+  ],
+  'Leaf Miner': [
+    'Abamectin (0.5 ml/L)',
+    'Spinosad spray',
+    'Yellow sticky traps',
+    'Avoid unnecessary pesticide sprays',
+    'Balanced fertilization',
+  ],
+  'Woolly Apple Aphid': [
+    'Imidacloprid soil application',
+    'Neem oil spray (3 ml/L)',
+    'Use resistant rootstocks',
+    'Encourage natural enemies',
+    'Avoid excess nitrogen',
+  ],
+  'Green Apple Aphid': [
+    'Imidacloprid / Thiamethoxam',
+    'Neem oil or insecticidal soap',
+    'Potassium nitrate foliar spray',
+    'Encourage lady beetles',
+    'Avoid excess nitrogen fertilization',
+  ],
+};
+
+
+function normalizeName(name: string): string {
+  // Replace all types of dashes with a regular hyphen, remove extra spaces
+  return name
+    .replace(/[\u2011\u2012\u2013\u2014\u2015]/g, '-') // replace en/em/non-breaking dashes
+    .replace(/\s*-\s*/g, '-') // remove spaces around hyphens
+    .replace(/\s+/g, ' ') // collapse multiple spaces
+    .trim();
+}
+
 export default function ClimateRiskPredictor(): JSX.Element {
   const [view, setView] = useState<View>('Diseases');
   const [riskModel, setRiskModel] = useState<'standard' | 'meta'>('standard');
@@ -293,10 +429,19 @@ const handlePredict = () => {
   console.log('🚀 Params sent to engine (Live):', paramsForRules);
 
   try {
-    const res =
+    let res =
       view === 'Diseases'
         ? calculateDiseaseRisks(paramsForRules as ClimateParams)
         : calculatePestRisks(paramsForRules as ClimateParams);
+
+    // Inject recommended treatment
+    res = res.map((item: any) => ({
+      ...item,
+      treatment:
+        view === 'Diseases'
+          ? (diseaseRecommendedTreatment[item.name]?.[0] ?? item.treatment)
+          : (pestRecommendedTreatment[item.name]?.[0] ?? item.treatment),
+    }));
 
     console.log('📊 Engine result:', res);
 
@@ -375,10 +520,19 @@ const handlePlanetAutoFill = (climate: any) => {
     console.log('🚀 Params sent to engine (Planet):', paramsForRules);
 
     try {
-      const res =
+      let res =
         view === 'Diseases'
           ? calculateDiseaseRisks(paramsForRules as ClimateParams)
           : calculatePestRisks(paramsForRules as ClimateParams);
+
+      // Inject recommended treatment
+      res = res.map((item: any) => ({
+        ...item,
+        treatment:
+          view === 'Diseases'
+            ? (diseaseRecommendedTreatment[item.name]?.[0] ?? item.treatment)
+            : (pestRecommendedTreatment[item.name]?.[0] ?? item.treatment),
+      }));
 
       console.log('📊 Engine result:', res);
 
@@ -441,42 +595,101 @@ const handlePlanetAutoFill = (climate: any) => {
   // Download report as PDF
 const handleDownloadReport = () => {
   const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.text('AppleKul Skyinsights - Prediction Report', 10, 15);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = 20;
+  let page = 1;
 
+  // Header
+  doc.setFontSize(18);
+  doc.setFont(undefined, 'bold');
+  doc.text('AppleKul Skyinsights', pageWidth / 2, y, { align: 'center' });
+  y += 10;
   doc.setFontSize(12);
-  doc.text(`Farm Health Score: ${farmHealthScore}%`, 10, 25);
+  doc.setFont(undefined, 'normal');
+  doc.text(`Prediction Report`, pageWidth / 2, y, { align: 'center' });
+  y += 10;
+  doc.setFontSize(11);
+  doc.text(`Farm Health Score: ${farmHealthScore}%`, 12, y);
+  y += 8;
+  doc.setDrawColor(180);
+  doc.line(10, y, pageWidth - 10, y);
+  y += 6;
 
-  let y = 35;
-  results.forEach((res: any, idx: number) => {
+  // Filter out zero score results
+  const filteredResults = results.filter((res: any) => res.score > 0);
+
+  filteredResults.forEach((res: any, idx: number) => {
+    if (y > 250) {
+      doc.setFontSize(10);
+      doc.text(`Page ${page}`, pageWidth - 20, 290);
+      doc.addPage();
+      y = 20;
+      page += 1;
+    }
+
+    // Normalize name for lookup and display
+    const normName = normalizeName(res.name);
+
+    // Disease/Pest Name and Risk
+    doc.setFontSize(13);
     doc.setFont(undefined, 'bold');
     doc.text(
-      `${idx + 1}. ${res.name} (${res.level ? res.level.toUpperCase() : 'UNKNOWN'})`,
-      10,
+      `${idx + 1}. ${normName} (${res.level ? res.level.toUpperCase() : 'UNKNOWN'})`,
+      12,
       y
     );
     y += 7;
+
+    // Score
+    doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
-    doc.text(`Score: ${Math.round(res.score)}%`, 12, y);
-    y += 7;
-    doc.text(`Recommended Treatment: ${res.treatment}`, 12, y);
+    doc.text(`Score: ${Math.round(res.score)}%`, 14, y);
     y += 7;
 
-    // Add prevention guide if available
-    const guide = view === 'Diseases'
-      ? diseasePreventionGuide[res.name]
-      : pestPreventionGuide[res.name];
-    if (guide) {
-      doc.text('Prevention Guide:', 12, y);
+    // Recommended Treatments
+    const treatmentList =
+      view === 'Diseases'
+        ? diseaseRecommendedTreatment[normName]
+        : pestRecommendedTreatment[normName];
+    if (treatmentList && treatmentList.length > 0) {
+      doc.setFont(undefined, 'bold');
+      doc.text('Recommended Treatments:', 14, y);
       y += 6;
+      doc.setFont(undefined, 'normal');
+      treatmentList.forEach((treat: string) => {
+        doc.text(`• ${treat}`, 16, y);
+        y += 6;
+      });
+    } else if (res.treatment) {
+      doc.text(`Recommended Treatment: ${res.treatment}`, 14, y);
+      y += 7;
+    }
+
+    // Prevention Guide
+    const guide = view === 'Diseases'
+      ? diseasePreventionGuide[normName]
+      : pestPreventionGuide[normName];
+    if (guide && guide.length > 0) {
+      doc.setFont(undefined, 'bold');
+      doc.text('Prevention Guide:', 14, y);
+      y += 6;
+      doc.setFont(undefined, 'normal');
       guide.forEach((tip: string) => {
-        doc.text(`- ${tip}`, 14, y);
+        doc.text(`• ${tip}`, 16, y);
         y += 6;
       });
     }
-    y += 4;
-    if (y > 270) { doc.addPage(); y = 15; }
+
+    // Separator
+    y += 2;
+    doc.setDrawColor(220);
+    doc.line(12, y, pageWidth - 12, y);
+    y += 7;
   });
+
+  // Footer with page number
+  doc.setFontSize(10);
+  doc.text(`Page ${page}`, pageWidth - 20, 290);
 
   doc.save('prediction_report.pdf');
 };
