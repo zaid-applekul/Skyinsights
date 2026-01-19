@@ -445,19 +445,19 @@ const handleDownloadReport = () => {
   doc.text('AppleKul Skyinsights - Prediction Report', 10, 15);
 
   doc.setFontSize(12);
-  doc.text(`Farm Health Score: ${farmHealthScore}`, 10, 25);
+  doc.text(`Farm Health Score: ${farmHealthScore}%`, 10, 25);
 
   let y = 35;
   results.forEach((res: any, idx: number) => {
     doc.setFont(undefined, 'bold');
     doc.text(
-      `${idx + 1}. ${res.name} (${(res.severity ? res.severity.toUpperCase() : 'UNKNOWN')})`,
+      `${idx + 1}. ${res.name} (${res.level ? res.level.toUpperCase() : 'UNKNOWN'})`,
       10,
       y
     );
     y += 7;
     doc.setFont(undefined, 'normal');
-    doc.text(`Description: ${res.description}`, 12, y);
+    doc.text(`Score: ${Math.round(res.score)}%`, 12, y);
     y += 7;
     doc.text(`Recommended Treatment: ${res.treatment}`, 12, y);
     y += 7;
