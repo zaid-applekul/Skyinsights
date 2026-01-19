@@ -1091,25 +1091,37 @@ export const PlanetMapViewer: React.FC<Props> = ({
 <div>
   <span className="text-xs font-semibold block mb-2">Data Fetch Mode</span>
 
+ <div className="mb-3 w-full flex bg-gray-100 rounded-lg p-1 shadow-sm">
   <button
     onClick={() => {
-      setDataFetchMode(prev => {
-        if (prev === 'boundary') {
-          cancelDrawing(); // clean up AOI when leaving boundary mode
-          return 'point';
-        }
-        return 'boundary';
-      });
+      if (dataFetchMode === 'boundary') {
+        cancelDrawing(); // clean up AOI when leaving boundary mode
+      }
+      setDataFetchMode('point');
     }}
-    className={`w-full px-3 py-2 rounded text-sm font-medium transition-colors
-      ${dataFetchMode === 'point'
-        ? 'bg-[#06542A] text-white hover:bg-[#043D1F]'
-        : 'bg-[#06542A] text-white hover:bg-[#043D1F]'}`}
+    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+      dataFetchMode === 'point'
+        ? 'bg-[#06542A] text-white shadow'
+        : 'text-gray-600 hover:bg-gray-200'
+    }`}
   >
-    {dataFetchMode === 'point'
-      ? '📍 Live Location'
-      : '🗺️ Boundary (AOI)'}
+    📍 Live Location
   </button>
+
+  <button
+    onClick={() => {
+      setDataFetchMode('boundary');
+    }}
+    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+      dataFetchMode === 'boundary'
+        ? 'bg-[#06542A] text-white shadow'
+        : 'text-gray-600 hover:bg-gray-200'
+    }`}
+  >
+    🗺️ Create Your Orchard
+  </button>
+</div>
+
 
   <p className="text-xs text-gray-600 mt-2">
     {dataFetchMode === 'point'
@@ -1120,7 +1132,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
         {/* ✅ LOADING STATE */}
         {loadingAOIs && (
           <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
-            📦 Loading saved boundaries...
+            📦 Loading saved Orchards...
           </div>
         )}
 
@@ -1145,70 +1157,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
         {/* BOUNDARY/AOI MODE */}
         {dataFetchMode === 'boundary' && (
           <div className="border-t pt-3">
-            {/* Saved Boundaries Section */}
-            {savedAOIs.length > 0 && (
-              <div className="mb-4">
-                <div className="text-xs font-semibold mb-2 flex items-center justify-between">
-                  <span>📍 Saved Boundaries ({savedAOIs.length})</span>
-                </div>
-                <div className="max-h-32 overflow-y-auto space-y-1 mb-3">
-                  {savedAOIs.map((aoi) => {
-                    const measurement = calculateMeasurement(aoi.geojson);
-                    const climate = aoiClimateData[aoi.id];
-                    return (
-                      <div
-                        key={aoi.id}
-                        className={`flex items-center gap-2 px-3 py-2 rounded text-xs transition-all ${
-                          selectedBoundaryId === aoi.id
-                            ? 'bg-green-500 text-white shadow-md'
-                            : 'bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        <button
-                          onClick={() => loadSavedBoundary(aoi)}
-                          className="flex-1 text-left"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">{aoi.name || 'Unnamed Boundary'}</span>
-                            <span className="text-[10px] opacity-75">
-                              {aoi.geojson.geometry.type}
-                            </span>
-                          </div>
-                          <div className="text-[10px] opacity-75 mt-0.5 flex items-center gap-2">
-                            {measurement.type === 'area' && measurement.area && (
-                              <span>📐 {measurement.area.acres.toFixed(2)} ac</span>
-                            )}
-                            <span>📅 {new Date(aoi.created_at).toLocaleDateString()}</span>
-                          </div>
-                          {climate && (
-                            <div className="text-[10px] opacity-90 mt-1 flex items-center gap-3">
-                              <span>🌡️ {formatClimate(climate.temperature, '°C')}</span>
-                              <span>💨 {formatClimate(climate.windSpeed, ' m/s')}</span>
-                              <span>🌧️ {formatClimate(climate.rainfall, ' mm')}</span>
-                            </div>
-                          )}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            renameBoundary(aoi.id, aoi.name || 'Unnamed Boundary');
-                          }}
-                          className={`px-2 py-1 rounded hover:bg-opacity-80 transition-colors ${
-                            selectedBoundaryId === aoi.id
-                              ? 'bg-green-600 text-white'
-                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                          title="Rename boundary"
-                        >
-                          ✏️
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
+            {/* Move Drawing Tools ABOVE Saved Boundaries Section */}
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold">Drawing Tools (AOI)</span>
               {(drawnGeoJSON.length > 0 || savedAOIs.length > 0) && (
@@ -1310,6 +1259,70 @@ export const PlanetMapViewer: React.FC<Props> = ({
                 }
                 {drawingMode === 'polygon' && currentDrawing.length < 3 && ' (need 3+)'
                 }
+              </div>
+            )}
+
+            {/* Saved Boundaries Section */}
+            {savedAOIs.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold mb-2 flex items-center justify-between">
+                  <span>📍 Saved Orchards ({savedAOIs.length})</span>
+                </div>
+                <div className="max-h-32 overflow-y-auto space-y-1 mb-3">
+                  {savedAOIs.map((aoi) => {
+                    const measurement = calculateMeasurement(aoi.geojson);
+                    const climate = aoiClimateData[aoi.id];
+                    return (
+                      <div
+                        key={aoi.id}
+                        className={`flex items-center gap-2 px-3 py-2 rounded text-xs transition-all ${
+                          selectedBoundaryId === aoi.id
+                            ? 'bg-green-500 text-white shadow-md'
+                            : 'bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        <button
+                          onClick={() => loadSavedBoundary(aoi)}
+                          className="flex-1 text-left"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{aoi.name || 'Unnamed Boundary'}</span>
+                            <span className="text-[10px] opacity-75">
+                              {aoi.geojson.geometry.type}
+                            </span>
+                          </div>
+                          <div className="text-[10px] opacity-75 mt-0.5 flex items-center gap-2">
+                            {measurement.type === 'area' && measurement.area && (
+                              <span>📐 {measurement.area.acres.toFixed(2)} ac</span>
+                            )}
+                            <span>📅 {new Date(aoi.created_at).toLocaleDateString()}</span>
+                          </div>
+                          {climate && (
+                            <div className="text-[10px] opacity-90 mt-1 flex items-center gap-3">
+                              <span>🌡️ {formatClimate(climate.temperature, '°C')}</span>
+                              <span>💨 {formatClimate(climate.windSpeed, ' m/s')}</span>
+                              <span>🌧️ {formatClimate(climate.rainfall, ' mm')}</span>
+                            </div>
+                          )}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            renameBoundary(aoi.id, aoi.name || 'Unnamed Boundary');
+                          }}
+                          className={`px-2 py-1 rounded hover:bg-opacity-80 transition-colors ${
+                            selectedBoundaryId === aoi.id
+                              ? 'bg-green-600 text-white'
+                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          }`}
+                          title="Rename boundary"
+                        >
+                          ✏️
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
