@@ -524,16 +524,29 @@ const handleDownloadReport = () => {
       )}
 
       {/* Toggle Button for Climate Form */}
-     <button
-  onClick={() => setShowClimateForm(!showClimateForm)}
-  className={`mb-3 w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
-    showClimateForm
-      ? 'bg-[#06542A] text-white hover:bg-[#043D1F]'
-      : 'bg-[#06542A] text-white hover:bg-[#043D1F]'
-  }`}
->
-  {showClimateForm ? 'Satellite Live Plus' : ' Satellite Live'}
-</button>
+  <div className="mb-3 w-full flex bg-gray-100 rounded-lg p-1 shadow-sm">
+  <button
+    onClick={() => setShowClimateForm(false)}
+    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+      !showClimateForm
+        ? 'bg-[#06542A] text-white shadow'
+        : 'text-gray-600 hover:bg-gray-200'
+    }`}
+  >
+    🛰️ Satellite Live
+  </button>
+
+  <button
+    onClick={() => setShowClimateForm(true)}
+    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+      showClimateForm
+        ? 'bg-[#06542A] text-white shadow'
+        : 'text-gray-600 hover:bg-gray-200'
+    }`}
+  >
+    🚀 Satellite Live Plus
+  </button>
+</div>
 
 
       {/* 2-column layout - hide left panel unless form is shown */}
