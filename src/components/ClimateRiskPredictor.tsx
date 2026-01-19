@@ -480,16 +480,17 @@ const handlePlanetAutoFill = (climate: any) => {
       )}
 
       {/* Toggle Button for Climate Form */}
-      <button
-        onClick={() => setShowClimateForm(!showClimateForm)}
-        className={`mb-3 w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
-          showClimateForm
-            ? 'bg-blue-600 text-white hover:bg-blue-700'
-            : 'bg-green-600 text-white hover:bg-green-700'
-        }`}
-      >
-        {showClimateForm ? 'Satellite Live Plus' : ' Satellite Live'}
-      </button>
+     <button
+  onClick={() => setShowClimateForm(!showClimateForm)}
+  className={`mb-3 w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
+    showClimateForm
+      ? 'bg-[#06542A] text-white hover:bg-[#043D1F]'
+      : 'bg-[#06542A] text-white hover:bg-[#043D1F]'
+  }`}
+>
+  {showClimateForm ? 'Satellite Live Plus' : ' Satellite Live'}
+</button>
+
 
       {/* 2-column layout - hide left panel unless form is shown */}
       <div className={`grid gap-4 flex-1 overflow-hidden ${showClimateForm ? 'grid-cols-1 lg:grid-cols-[1fr_1.6fr]' : 'grid-cols-1'}`}>
