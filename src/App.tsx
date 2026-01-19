@@ -493,7 +493,7 @@ function App() {
         <footer className="text-center py-8 text-gray-600 border-t border-green-200 mt-12">
           <div className="pt-8">
             <p className="text-sm">
-               <span className="font-semibold text-green-700">AppleKul™ Skyinsights</span>
+               <span className="font-semibold text-green-700">AppleKul™ SkyInsights</span>
               
             </p>
             <p className="text-xs mt-2 text-gray-500">
