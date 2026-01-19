@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut, onMenuItemClick
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-2xl" style={{
               textShadow: '0 2px 4px rgba(0,0,0,0.1), 0 4px 8px rgba(16, 185, 129, 0.2)'
             }}>
-             AppleKul™ Skyinsights
+             AppleKul™ SkyInsights
             </h1>
             <div className="flex items-center justify-center space-x-2 mt-1">
               <div className="h-px w-8 bg-green-200"></div>
@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut, onMenuItemClick
         </div>
         
         <p className="text-center text-green-50 text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed mb-0 font-light">
-           Smart Farming, Data Driven Decision 
+           Smart Farming,Data Driven Decision. 
         </p>
         
       </div>
