@@ -191,6 +191,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
         </form>
 
         <div className="mt-6 text-center space-y-3">
+          {/* 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
@@ -209,6 +210,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthChange }) => {
           >
             {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
           </button>
+          */}
         </div>
         
         {/* Feature Pills */}
