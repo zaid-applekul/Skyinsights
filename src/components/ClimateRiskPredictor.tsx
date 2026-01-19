@@ -6,6 +6,7 @@ import {
   ClimateParams,
 } from '../utils/climateRiskRules';
 import PlanetMapViewer from './PlanetMapViewer';
+import jsPDF from 'jspdf';
 
 type View = 'Diseases' | 'Pests';
 
@@ -436,6 +437,49 @@ const handlePlanetAutoFill = (climate: any) => {
   };
 
   const healthColors = getHealthColorClasses(farmHealthScore);
+
+  // Download report as PDF
+const handleDownloadReport = () => {
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text('AppleKul Skyinsights - Prediction Report', 10, 15);
+
+  doc.setFontSize(12);
+  doc.text(`Farm Health Score: ${farmHealthScore}`, 10, 25);
+
+  let y = 35;
+  results.forEach((res: any, idx: number) => {
+    doc.setFont(undefined, 'bold');
+    doc.text(
+      `${idx + 1}. ${res.name} (${(res.severity ? res.severity.toUpperCase() : 'UNKNOWN')})`,
+      10,
+      y
+    );
+    y += 7;
+    doc.setFont(undefined, 'normal');
+    doc.text(`Description: ${res.description}`, 12, y);
+    y += 7;
+    doc.text(`Recommended Treatment: ${res.treatment}`, 12, y);
+    y += 7;
+
+    // Add prevention guide if available
+    const guide = view === 'Diseases'
+      ? diseasePreventionGuide[res.name]
+      : pestPreventionGuide[res.name];
+    if (guide) {
+      doc.text('Prevention Guide:', 12, y);
+      y += 6;
+      guide.forEach((tip: string) => {
+        doc.text(`- ${tip}`, 14, y);
+        y += 6;
+      });
+    }
+    y += 4;
+    if (y > 270) { doc.addPage(); y = 15; }
+  });
+
+  doc.save('prediction_report.pdf');
+};
 
   return (
     <div className="card card-lg h-full flex flex-col">
@@ -899,6 +943,14 @@ const handlePlanetAutoFill = (climate: any) => {
     </p>
   </div>
 )}
+
+      {/* Download Report Button */}
+      <button
+        className="mt-4 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800"
+        onClick={handleDownloadReport}
+      >
+        Download Report (PDF)
+      </button>
     </div>
   );
 }
