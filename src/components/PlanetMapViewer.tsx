@@ -167,6 +167,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
   const [live, setLive] = useState<boolean>(false);
   const [showLayerDetails, setShowLayerDetails] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [expandedLayer, setExpandedLayer] = useState<string | null>(null);
 
   const baseLayerRef = useRef<any>(null);
   const labelLayerRef = useRef<any>(null);
@@ -1073,6 +1074,218 @@ export const PlanetMapViewer: React.FC<Props> = ({
     }
   }, [drawnGeoJSON, initialLat, initialLon]);
 
+  // Helper to get short description (first sentence)
+  const getShortDescription = (desc: string) =>
+    desc.split(/[.?!]/)[0] + '.';
+
+  const LAYER_DETAILS: Record<string, { name: string; ids: string[]; description: string }> = {
+    EVI: {
+      name: 'EVI',
+      ids: ['EVI'],
+      description: 'More green = healthy, dense plants. Less green = bare soil, stressed, or sparse vegetation.'
+    },
+    '3_NDVI-L1C': {
+      name: 'NDVI',
+      ids: ['3_NDVI-L1C'],
+      description: 'More green = healthy crops. Brown/gray = soil, water, or stressed plants.'
+    },
+    'MOISTURE-INDEX': {
+      name: 'Moisture',
+      ids: ['MOISTURE-INDEX'],
+      description: 'More blue = wetter soil/canopy. More yellow/red = drier, less moisture.'
+    },
+    '5_MOISTURE-INDEX-L1C': {
+      name: 'Moisture',
+      ids: ['5_MOISTURE-INDEX-L1C'],
+      description: 'More blue = wetter soil/canopy. More yellow/red = drier, less moisture.'
+    },
+    '7_NDWI-L1C': {
+      name: 'Water index',
+      ids: ['7_NDWI-L1C'],
+      description: 'More blue = water or wet areas. Brown/gray = dry land or sparse vegetation.'
+    },
+    '8_NDSI-L1C': {
+      name: 'Snow index',
+      ids: ['8_NDSI-L1C'],
+      description: 'More white/blue = snow/ice. Brown = no snow, bare ground or vegetation.'
+    },
+    '1_TRUE-COLOR-L1C': {
+      name: 'True color',
+      ids: ['1_TRUE-COLOR-L1C'],
+      description: 'Green = vegetation. Blue = water. Brown = soil/urban. Less green/blue = less vegetation/water.'
+    },
+    '2_FALSE-COLOR-L1C': {
+      name: 'False color',
+      ids: ['2_FALSE-COLOR-L1C'],
+      description: 'Red = healthy plants. Blue/black = water. Less red = less vegetation.'
+    },
+    '4_FALSE-COLOR-URBAN-L1C': {
+      name: 'Urban',
+      ids: ['4_FALSE-COLOR-URBAN-L1C'],
+      description: 'Pink/purple = urban/built-up. Green = vegetation. Less pink = less urban area.'
+    },
+    '2_TONEMAPPED-NATURAL-COLOR-L1C': {
+      name: 'Natural color',
+      ids: ['2_TONEMAPPED-NATURAL-COLOR-L1C'],
+      description: 'Enhanced natural colors. More green/blue = more vegetation/water. Less = drier/urban.'
+    },
+    '6_SWIR-L1C': {
+      name: 'SWIR',
+      ids: ['6_SWIR-L1C'],
+      description: 'Blue = wet areas. Yellow/orange = dry soil or stressed plants.'
+    },
+    OSAVI: {
+      name: 'OSAVI',
+      ids: ['OSAVI'],
+      description: 'More green = more vegetation. Less green = bare or sparse cover.'
+    },
+    PSRI: {
+      name: 'PSRI',
+      ids: ['PSRI'],
+      description: 'Red/orange = aging or stressed leaves. Green = healthy, young foliage.'
+    },
+    EXG: {
+      name: 'EXG',
+      ids: ['EXG'],
+      description: 'Bright green = more green plants. Dark/gray = soil, water, or shadows.'
+    },
+    EXR: {
+      name: 'EXR',
+      ids: ['EXR'],
+      description: 'Red = mature or stressed plants. Blue/green = healthy, early-stage vegetation.'
+    },
+    VARI: {
+      name: 'VARI',
+      ids: ['VARI'],
+      description: 'Green = healthy vegetation. Brown/gray = soil, urban, or stressed.'
+    },
+    GNDVI: {
+      name: 'GNDVI',
+      ids: ['GNDVI'],
+      description: 'Green = high chlorophyll. Purple/black = low chlorophyll or bare soil.'
+    },
+    NDMI: {
+      name: 'NDMI',
+      ids: ['NDMI'],
+      description: 'Blue = moist, hydrated plants. Yellow/orange = dry, stressed canopy.'
+    },
+    SAVI: {
+      name: 'SAVI',
+      ids: ['SAVI'],
+      description: 'Green = dense vegetation. Blue/yellow = sparse or non-vegetated.'
+    },
+    NDWI: {
+      name: 'NDWI',
+      ids: ['NDWI'],
+      description: 'Blue = water/wet. Brown/gray = dry land or vegetation.'
+    },
+    LSWI: {
+      name: 'LSWI',
+      ids: ['LSWI'],
+      description: 'Blue = wet leaves/soil. Yellow = dry leaves/soil.'
+    },
+    NGRDI: {
+      name: 'NGRDI',
+      ids: ['NGRDI'],
+      description: 'Green = nitrogen-rich, healthy leaves. Red/gray = poor or unhealthy.'
+    },
+    CIGREEN: {
+      name: 'CIGREEN',
+      ids: ['CIGREEN'],
+      description: 'Bright green = dense chlorophyll. Dark green = low pigment.'
+    },
+    GLI: {
+      name: 'GLI',
+      ids: ['GLI'],
+      description: 'Green = dense leaf cover. Brown/black = soil or shadows.'
+    },
+    NDRE: {
+      name: 'NDRE',
+      ids: ['NDRE'],
+      description: 'Green = mature, nitrogen-rich canopy. Yellow/orange = sparse or early canopy.'
+    },
+    MSAVI: {
+      name: 'MSAVI',
+      ids: ['MSAVI'],
+      description: 'Green = healthy vegetation. Blue/gray = soil or sparse cover.'
+    },
+    DVI: {
+      name: 'DVI',
+      ids: ['DVI'],
+      description: 'Green = more biomass. Negative/low = little or no vegetation.'
+    },
+    RVI: {
+      name: 'RVI',
+      ids: ['RVI'],
+      description: 'Green = dense vegetation. Low = sparse or low biomass.'
+    },
+    IPVI: {
+      name: 'IPVI',
+      ids: ['IPVI'],
+      description: 'Green = healthy vegetation. Low = less vegetation.'
+    },
+    NDGI: {
+      name: 'NDGI',
+      ids: ['NDGI'],
+      description: 'Blue = moist/green. Brown = dry or bare.'
+    },
+    RENDVI: {
+      name: 'RENDVI',
+      ids: ['RENDVI'],
+      description: 'Green = high chlorophyll. Low = low red-edge chlorophyll.'
+    },
+    MCARI: {
+      name: 'MCARI',
+      ids: ['MCARI'],
+      description: 'Green = healthy leaves. Yellow/dark = stressed or soil influence.'
+    },
+    MTCI: {
+      name: 'MTCI',
+      ids: ['MTCI'],
+      description: 'Green = high chlorophyll/nitrogen. Low = low chlorophyll.'
+    },
+    TCARI: {
+      name: 'TCARI',
+      ids: ['TCARI'],
+      description: 'Green = low stress, good pigment. Low = high stress.'
+    },
+    TSAVI: {
+      name: 'TSAVI',
+      ids: ['TSAVI'],
+      description: 'Green = more vegetation. Low = soil or sparse cover.'
+    },
+    WDVI: {
+      name: 'WDVI',
+      ids: ['WDVI'],
+      description: 'Green = more canopy. Negative/low = bare soil.'
+    },
+    PVI: {
+      name: 'PVI',
+      ids: ['PVI'],
+      description: 'Green = more vegetation. Low = bare or soil line.'
+    },
+    TVI: {
+      name: 'TVI',
+      ids: ['TVI'],
+      description: 'Green = more biomass. Low = less vegetation.'
+    },
+    VIGREEN: {
+      name: 'VIGREEN',
+      ids: ['VIGREEN'],
+      description: 'Green = strong vegetation. Low = weak or sparse vegetation.'
+    },
+    SIPI: {
+      name: 'SIPI',
+      ids: ['SIPI'],
+      description: 'Green = healthy, stable pigments. Low = pigment stress.'
+    },
+    WBI: {
+      name: 'WBI',
+      ids: ['WBI'],
+      description: 'Blue = high leaf water. Low = dry internal leaves.'
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 h-full flex flex-col">
       <div className="text-sm text-gray-600 mb-2">Planet Map Viewer</div>
@@ -1332,33 +1545,58 @@ export const PlanetMapViewer: React.FC<Props> = ({
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold">Layers</span>
-            <button
-              type="button"
-              className="text-[11px] text-black-600 underline"
-              onClick={() => setShowLayerDetails((v) => !v)}
-            >
-              {showLayerDetails ? 'Hide Layers' : 'Systematic Layers Info'}
-            </button>
           </div>
-
-          {/* DRILLDOWN GROUPS */}
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {Object.entries(LAYER_GROUPS).map(([groupName, layers]) => (
               <div key={groupName} className="border-b border-gray-200 pb-2 last:border-b-0">
-                <button
-                  onClick={() => toggleGroup(groupName)}
-                  className="w-full flex items-center justify-between text-xs font-medium p-2 bg-gray-100 hover:bg-gray-200 rounded transition-all"
-                >
-                  <span>{groupName}</span>
-                  <span className={`transform transition-transform ${
-                    expandedGroup === groupName ? 'rotate-180' : ''
-                  }`}>
-                    ▼
-                  </span>
-                </button>
-                
+                <div className="flex items-center">
+                  <button
+                    onClick={() => toggleGroup(groupName)}
+                    className="flex-1 flex items-center justify-between text-xs font-medium p-2 bg-gray-100 hover:bg-gray-200 rounded transition-all"
+                  >
+                    <span>{groupName}</span>
+                    <span className="flex items-center gap-1">
+                      {/* Info button on the right, but left of down arrow */}
+                      <button
+                        type="button"
+                        className="text-black-500 hover:text-black-700 text-xs px-1"
+                        title={`Show info for ${groupName}`}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setExpandedLayer(expandedLayer === groupName ? null : groupName);
+                        }}
+                      >
+                        🛈
+                      </button>
+                      <span className={`transform transition-transform ${expandedGroup === groupName ? 'rotate-180' : ''}`}>
+                        ▼
+                      </span>
+                    </span>
+                  </button>
+                </div>
+                {/* Info for all layers in group */}
+                {expandedLayer === groupName && (
+                  <div className="bg-white border border-blue-300 rounded shadow-lg p-2 text-[11px] mt-2">
+                    <div className="font-semibold text-blue-700 mb-1">{groupName} Layers</div>
+                    <ul className="space-y-2">
+                      {layers.map((id) => (
+                        <li key={id}>
+                          <span className="font-semibold">{LAYER_DETAILS[id]?.name ?? id}</span>
+                          <span className="text-gray-400"> ({id})</span>
+                          <div>{LAYER_DETAILS[id]?.description}</div>
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      className="mt-2 text-xs text-blue-500 hover:underline"
+                      onClick={() => setExpandedLayer(null)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
                 {expandedGroup === groupName && (
-                  <div className="pl-4 mt-1 flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {layers.map((id) => (
                       <button
                         key={id}
@@ -1379,22 +1617,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
                 )}
               </div>
             ))}
-
           </div>
-
-          {showLayerDetails && (
-            <div className="mt-2 bg-white border border-gray-200 rounded p-2 text-[11px] text-gray-700">
-              <div className="font-semibold mb-1">Layer details</div>
-              <ul className="space-y-1 max-h-32 overflow-y-auto">
-                {LAYER_IDS.map((id) => (
-                  <li key={id}>
-                    <span className="font-medium">{friendlyName(id)}:</span>{' '}
-                    "{id}"
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
 
         {/* DATE RANGE & BUTTONS */}
