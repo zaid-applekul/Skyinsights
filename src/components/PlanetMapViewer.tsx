@@ -162,6 +162,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
     () => new Date().toISOString().slice(0, 10)
   );
   const [activeLayers, setActiveLayers] = useState<Record<string, boolean>>({});
+  const [lastActiveLayer, setLastActiveLayer] = useState<string>("EVI"); // <-- Add this line
   const [planetUnavailable, setPlanetUnavailable] = useState<boolean>(false);
   const leafletLayersRef = useRef<Record<string, any>>({});
   const liveRef = useRef<number | null>(null);
@@ -727,6 +728,14 @@ export const PlanetMapViewer: React.FC<Props> = ({
     const L = (window as any).L;
     const on = !activeLayers[id];
     setActiveLayers((s) => ({ ...s, [id]: on }));
+
+    if (on) {
+      setLastActiveLayer(id); // <-- Track the last toggled-on layer
+    } else {
+      // If turning off, pick another active layer or fallback to EVI
+      const stillActive = Object.keys(activeLayers).filter(k => k !== id && activeLayers[k]);
+      setLastActiveLayer(stillActive[0] || "EVI");
+    }
 
     if (on && L && mapRef.current) {
       try {
@@ -1365,6 +1374,112 @@ export const PlanetMapViewer: React.FC<Props> = ({
     },
   };
 
+  // 1. Simple horizontal legend bar
+  const LayerLegendBar: React.FC<{ activeLayer: string }> = ({ activeLayer }) => {
+    const details = LAYER_DETAILS[activeLayer] || {};
+    const desc = (details.description || "").toLowerCase();
+    const name = (details.name || activeLayer).toLowerCase();
+    const id = activeLayer.toUpperCase();
+    const idBase = id.replace(/-L1C$/i, '');
+    const friendly = friendlyName(activeLayer).toLowerCase();
+
+    let gradient = "linear-gradient(90deg, #800026 0%, #FFD700 50%, #008000 100%)";
+    let minLabel = "Low";
+    let maxLabel = "High";
+    let cloudLabel = "Clouds";
+
+    // Helper to check if any string matches a keyword
+    const matches = (...keywords: string[]) =>
+      [id, idBase, name, friendly, desc].some(str =>
+        keywords.some(kw => str.includes(kw.toLowerCase()))
+      );
+
+    if (matches("ndvi", "evi", "veg", "vegetation", "osavi", "savi", "msavi", "gndvi", "ndre", "rendvi", "mcari", "mtci", "tcari", "tsavi")) {
+      minLabel = "Low vegetation";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #800026 0%, #FFD700 50%, #008000 100%)";
+    } else if (matches("moisture", "ndmi", "ndwi", "lswi", "water", "wbi")) {
+      minLabel = "Dry";
+      maxLabel = "Wet";
+      gradient = "linear-gradient(90deg, #F4E2D8 0%, #4169E1 100%)";
+    } else if (matches("snow", "ndsi", "ice")) {
+      minLabel = "No snow";
+      maxLabel = "Snow/Ice";
+      gradient = "linear-gradient(90deg, #696969 0%, #FFFFFF 100%)";
+    } else if (matches("urban", "built")) {
+      minLabel = "Vegetation";
+      maxLabel = "Urban";
+      gradient = "linear-gradient(90deg, #00FF00 0%, #9932CC 100%)";
+    } else if (matches("true color", "natural color", "false color")) {
+      minLabel = "Soil/Urban";
+      maxLabel = "Vegetation/Water";
+      gradient = "linear-gradient(90deg, #bfa76f 0%, #00bfff 50%, #228B22 100%)";
+    } else if (matches("chlorophyll", "pigment")) {
+      minLabel = "Low pigment";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #f7e1a0 0%, #228B22 100%)";
+    } else if (matches("NDMI-NDVI")) {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #e0eafc 0%, #cfdef3 50%, #008000 100%)";
+    } else if (matches("GNDVI-NDRE")) {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #f7e1a0 0%, #228B22 100%)";
+    } else if (matches("LSWI-PSRI")) {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #bfa76f 0%, #00bfff 50%, #FFD700 100%)";
+    } else if (matches("NDWI-NDVI")) {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #4169E1 0%, #FFD700 50%, #008000 100%)";
+    } else if (matches("NDMI-SIPI")) {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #f7e1a0 0%, #4169E1 100%)";
+    } else if (matches("SIPI-PSRI")) {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #f7e1a0 0%, #FFD700 50%, #bfa76f 100%)";
+    } else {
+      minLabel = "Low";
+      maxLabel = "High";
+      gradient = "linear-gradient(90deg, #800026 0%, #FFD700 50%, #008000 100%)";
+    }
+
+    return (
+      <div className="w-full flex flex-col items-center mt-2 mb-4">
+        <div className="flex w-full items-center justify-between px-2 text-xs text-gray-700 font-medium">
+          <span>{minLabel}</span>
+          <span>{maxLabel}</span>
+          <span>{cloudLabel}</span>
+        </div>
+        <div className="relative w-full flex items-center" style={{height: 16}}>
+          <div
+            style={{
+              background: gradient,
+              height: 8,
+              borderRadius: 4,
+              width: "90%",
+              margin: "0 auto",
+            }}
+          />
+          {/* Clouds bar (gray) at the end */}
+          <div
+            style={{
+              background: "#e5e7eb",
+              height: 8,
+              width: "10%",
+              borderRadius: 4,
+              marginLeft: 4,
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 h-full flex flex-col">
       <div className="text-sm text-gray-600 mb-2">Planet Map Viewer</div>
@@ -1376,6 +1491,8 @@ export const PlanetMapViewer: React.FC<Props> = ({
           className="rounded"
         />
       </div>
+      {/* Legend bar below the map */}
+      <LayerLegendBar activeLayer={lastActiveLayer} />
 
       <div className="bg-gray-50 p-3 rounded flex flex-col gap-3">
         
@@ -1547,8 +1664,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
             {currentDrawing.length > 0 && (
               <div className="mb-2 text-xs text-gray-600 bg-blue-50 p-2 rounded">
                 📍 Points: {currentDrawing.length}
-                {drawingMode === 'line' && currentDrawing.length < 2 && ' (need 2+)'
-                }
+                {drawingMode === 'line' && currentDrawing.length < 2 && ' (need 2+)'}
                 {drawingMode === 'polygon' && currentDrawing.length < 3 && ' (need 3+)'
                 }
               </div>
