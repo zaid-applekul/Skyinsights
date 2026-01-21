@@ -101,7 +101,7 @@ const LAYER_IDS = [
   
   // 🔥 PHASE 2 NEW (11 NEW UNUSED)
   'RENDVI', 'MCARI', 'MTCI', 'TCARI', 'TSAVI', 'WDVI', 'PVI', 
-  'TVI', 'VIGREEN', 'SIPI', 'WBI'
+  'TVI', 'VIGREEN', 'SIPI', 'WBI','NDMI-NDVI','GNDVI-NDRE','LSWI-PSRI','NDWI-NDVI', 'NDMI-SIPI','SIPI-PSRI'
 ];
 
 const LAYER_GROUPS = {
@@ -109,6 +109,7 @@ const LAYER_GROUPS = {
   '🔥 Apple Disease': ['PSRI', 'EXG','EXR', 'VARI', 'NGRDI', 'CIGREEN', 'GLI', 'NDGI'],
   '💧 Moisture/Water': ['MOISTURE-INDEX', '5_MOISTURE-INDEX-L1C', 'NDMI', 'NDWI', 'LSWI'],
   '🌈 Visual': ['1_TRUE-COLOR-L1C', '2_FALSE-COLOR-L1C', '4_FALSE-COLOR-URBAN-L1C', '2_TONEMAPPED-NATURAL-COLOR-L1C', '6_SWIR-L1C'],
+  '🧪 Fusion ': ['NDMI-NDVI','GNDVI-NDRE','LSWI-PSRI','NDWI-NDVI', 'NDMI-SIPI','SIPI-PSRI'],
   '❄️ Other': ['8_NDSI-L1C', 'DVI', 'RVI', 'IPVI', 'WDVI', 'PVI', 'TVI', 'VIGREEN', 'SIPI', 'WBI']
 };
 
