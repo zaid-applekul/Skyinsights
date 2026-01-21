@@ -1093,12 +1093,16 @@ export const PlanetMapViewer: React.FC<Props> = ({
     'MOISTURE-INDEX': {
       name: 'Moisture',
       ids: ['MOISTURE-INDEX'],
-      description: 'More blue = wetter soil/canopy. More yellow/red = drier, less moisture.'
+      description:
+        'Blue or darker colours indicate wet soil or well-hydrated crops. ' +
+        'Yellow to red colours indicate dry soil or moisture-stressed vegetation.'
     },
     '5_MOISTURE-INDEX-L1C': {
       name: 'Moisture',
       ids: ['5_MOISTURE-INDEX-L1C'],
-      description: 'More blue = wetter soil/canopy. More yellow/red = drier, less moisture.'
+      description:
+        'Blue or darker colours indicate higher moisture in soil or canopy. ' +
+        'Yellow or reddish colours indicate low moisture and drought stress.'
     },
     '7_NDWI-L1C': {
       name: 'Water index',
@@ -1133,7 +1137,9 @@ export const PlanetMapViewer: React.FC<Props> = ({
     '6_SWIR-L1C': {
       name: 'SWIR',
       ids: ['6_SWIR-L1C'],
-      description: 'Blue = wet areas. Yellow/orange = dry soil or stressed plants.'
+      description:
+        'Darker or bluish areas indicate wet soil or moist vegetation. ' +
+        'Bright yellow, orange, or white areas indicate dry soil, bare land, or stressed crops.'
     },
     OSAVI: {
       name: 'OSAVI',
@@ -1143,7 +1149,9 @@ export const PlanetMapViewer: React.FC<Props> = ({
     PSRI: {
       name: 'PSRI',
       ids: ['PSRI'],
-      description: 'Red/orange = aging or stressed leaves. Green = healthy, young foliage.'
+      description:
+        'Yellow to red colours indicate leaf aging, senescence, or stress. ' +
+        'Green or darker colours indicate young, healthy foliage.'
     },
     EXG: {
       name: 'EXG',
@@ -1153,7 +1161,9 @@ export const PlanetMapViewer: React.FC<Props> = ({
     EXR: {
       name: 'EXR',
       ids: ['EXR'],
-      description: 'Red = mature or stressed plants. Blue/green = healthy, early-stage vegetation.'
+      description:
+        'Red or bright areas indicate higher red reflectance, often linked to crop maturity or stress. ' +
+        'Green or bluish areas indicate healthier, actively growing vegetation.'
     },
     VARI: {
       name: 'VARI',
@@ -1163,7 +1173,9 @@ export const PlanetMapViewer: React.FC<Props> = ({
     GNDVI: {
       name: 'GNDVI',
       ids: ['GNDVI'],
-      description: 'Green = high chlorophyll. Purple/black = low chlorophyll or bare soil.'
+      description:
+        'Bright green areas indicate high chlorophyll and healthy vegetation. ' +
+        'Dark, purple, or gray areas indicate low chlorophyll, sparse crops, or bare soil.'
     },
     NDMI: {
       name: 'NDMI',
@@ -1188,12 +1200,16 @@ export const PlanetMapViewer: React.FC<Props> = ({
     NGRDI: {
       name: 'NGRDI',
       ids: ['NGRDI'],
-      description: 'Green = nitrogen-rich, healthy leaves. Red/gray = poor or unhealthy.'
+      description:
+        'Green-dominant areas indicate healthy, nitrogen-rich leaves. ' +
+        'Red, brown, or gray areas indicate poor vegetation or stress.'
     },
     CIGREEN: {
       name: 'CIGREEN',
       ids: ['CIGREEN'],
-      description: 'Bright green = dense chlorophyll. Dark green = low pigment.'
+      description:
+        'Bright green colours indicate dense chlorophyll and strong photosynthesis. ' +
+        'Dull or dark colours indicate reduced pigment or crop stress.'
     },
     GLI: {
       name: 'GLI',
@@ -1203,7 +1219,9 @@ export const PlanetMapViewer: React.FC<Props> = ({
     NDRE: {
       name: 'NDRE',
       ids: ['NDRE'],
-      description: 'Green = mature, nitrogen-rich canopy. Yellow/orange = sparse or early canopy.'
+      description:
+        'Green or bright areas indicate nitrogen-rich, healthy canopy. ' +
+        'Yellow or dull areas indicate early stress or low nitrogen levels.'
     },
     MSAVI: {
       name: 'MSAVI',
@@ -1238,17 +1256,23 @@ export const PlanetMapViewer: React.FC<Props> = ({
     MCARI: {
       name: 'MCARI',
       ids: ['MCARI'],
-      description: 'Green = healthy leaves. Yellow/dark = stressed or soil influence.'
+      description:
+        'Yellow or bright areas indicate chlorophyll stress or strong soil influence. ' +
+        'Green or darker areas indicate healthier leaf conditions.'
     },
     MTCI: {
       name: 'MTCI',
       ids: ['MTCI'],
-      description: 'Green = high chlorophyll/nitrogen. Low = low chlorophyll.'
+      description:
+        'Green or bright colours indicate high chlorophyll and good nitrogen status. ' +
+        'Dull or yellowish colours indicate nutrient stress.'
     },
     TCARI: {
       name: 'TCARI',
       ids: ['TCARI'],
-      description: 'Green = low stress, good pigment. Low = high stress.'
+      description:
+        'Yellow or bright colours indicate chlorophyll stress. ' +
+        'Green or darker colours indicate healthier vegetation.'
     },
     TSAVI: {
       name: 'TSAVI',
@@ -1284,7 +1308,61 @@ export const PlanetMapViewer: React.FC<Props> = ({
       name: 'WBI',
       ids: ['WBI'],
       description: 'Blue = high leaf water. Low = dry internal leaves.'
-    }
+    },
+    'NDMI-NDVI': {
+      name: 'NDMI-NDVI',
+      ids: ['NDMI-NDVI'],
+      description:
+        'Combines crop greenness and moisture. ' +
+        'Green-dominant areas indicate healthy crops with good moisture. ' +
+        'Green mixed with dry or pale tones suggests crops are green but moisture is low. ' +
+        'Non-green or faded areas indicate poor vegetation or stressed fields.'
+    },
+    'GNDVI-NDRE': {
+      name: 'GNDVI-NDRE',
+      ids: ['GNDVI-NDRE'],
+      description:
+        'Combines overall greenness with red-edge crop health. ' +
+        'Uniform green shades indicate healthy crops with good nutrient uptake. ' +
+        'Mixed or uneven colours suggest early stress, nutrient imbalance, or patchy growth. ' +
+        'Dull or non-green areas indicate unhealthy or sparse vegetation.'
+    },
+    'LSWI-PSRI': {
+      name: 'LSWI-PSRI',
+      ids: ['LSWI-PSRI'],
+      description:
+        'Combines water condition with leaf aging. ' +
+        'Greenish areas indicate sufficient water and healthy leaves. ' +
+        'Green mixed with brownish or pale tones suggests water stress and early leaf damage. ' +
+        'Non-green areas indicate strong stress or crop decline.'
+    },
+    'NDWI-NDVI': {
+      name: 'NDWI-NDVI',
+      ids: ['NDWI-NDVI'],
+      description:
+        'Combines water presence with crop growth. ' +
+        'Balanced green shades indicate healthy crops with proper water levels. ' +
+        'Green mixed with bluish or washed-out tones suggests excess water affecting growth. ' +
+        'Faded or non-green areas indicate weak or damaged crops.'
+    },
+    'NDMI-SIPI': {
+      name: 'NDMI-SIPI',
+      ids: ['NDMI-SIPI'],
+      description:
+        'Combines moisture status with leaf pigment health. ' +
+        'Healthy green areas indicate good moisture and stable leaf colour. ' +
+        'Green mixed with yellowish tones suggests moisture stress impacting leaf health. ' +
+        'Non-green areas indicate severe stress or crop damage.'
+    },
+    'SIPI-PSRI': {
+      name: 'SIPI-PSRI',
+      ids: ['SIPI-PSRI'],
+      description:
+        'Combines pigment stability with leaf aging. ' +
+        'Deep green shades indicate young, actively growing crops. ' +
+        'Green mixed with yellow or brown tones indicates aging or stress. ' +
+        'Non-green areas indicate mature, senescing, or damaged crops.'
+    },
   };
 
   return (
