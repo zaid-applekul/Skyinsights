@@ -884,6 +884,11 @@ y = 50; // move below logo
         (v.lang && v.lang.toLowerCase().startsWith('ur')) ||
         (v.name && v.name.toLowerCase().includes('urdu'))
     ) ||
+    voices?.find(
+      (v) =>
+        (v.lang && v.lang.toLowerCase().startsWith('en')) ||
+        (v.name && v.name.toLowerCase().includes('english'))
+    ) ||
     voices?.[0];
 
   // Urdu summary: Use Urdu name and tips if available, else fallback to English
@@ -1317,14 +1322,37 @@ y = 50; // move below logo
                   v =>
                     (v.lang && v.lang.toLowerCase().startsWith('ur')) ||
                     (v.name && v.name.toLowerCase().includes('urdu'))
-                )?.name || voices?.[0]?.name || ''
+                )?.name ||
+                voices?.find(
+                  v =>
+                    (v.lang && v.lang.toLowerCase().startsWith('hi')) ||
+                    (v.name && v.name.toLowerCase().includes('hindi'))
+                )?.name ||
+                voices?.find(
+                  v =>
+                    (v.lang && v.lang.toLowerCase().startsWith('en')) ||
+                    (v.name && v.name.toLowerCase().includes('english'))
+                )?.name ||
+                voices?.[0]?.name ||
+                ''
               }
               lang={
                 voices?.find(
                   v =>
                     (v.lang && v.lang.toLowerCase().startsWith('ur')) ||
                     (v.name && v.name.toLowerCase().includes('urdu'))
-                )?.lang || 'ur-PK'
+                )?.lang ||
+                voices?.find(
+                  v =>
+                    (v.lang && v.lang.toLowerCase().startsWith('hi')) ||
+                    (v.name && v.name.toLowerCase().includes('hindi'))
+                )?.lang ||
+                voices?.find(
+                  v =>
+                    (v.lang && v.lang.toLowerCase().startsWith('en')) ||
+                    (v.name && v.name.toLowerCase().includes('english'))
+                )?.lang ||
+                'en-US'
               }
               rate={0.95}
               pitch={1}
