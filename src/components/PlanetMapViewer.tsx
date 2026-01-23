@@ -118,6 +118,7 @@ type Props = {
   initialLon?: number;
   configId?: string;
   onAutoFill: (params: Record<string, any>) => void;
+  recommendedLayers?: string[];
 };
 
 interface GeoJSONCoordinate extends Array<number> {
@@ -145,6 +146,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
   initialLon,
   configId,
   onAutoFill,
+  recommendedLayers,
 }) => {
   const defaultLat = initialLat ?? 34.1;
   const defaultLon = initialLon ?? 74.8;
@@ -1498,7 +1500,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
         
        {/* DATA FETCH MODE TOGGLE */}
 <div>
-  <span className="text-xs font-semibold block mb-2">Data Fetch Mode</span>
+  <span className="text-xs font-semibold block mb-2 text-center">Data Fetch Mode</span>
 
  <div className="mb-3 w-full flex bg-gray-100 rounded-lg p-1 shadow-sm">
   <button
@@ -1532,216 +1534,228 @@ export const PlanetMapViewer: React.FC<Props> = ({
 </div>
 
 
-  <p className="text-xs text-gray-600 mt-2">
+  <p className="text-xs text-gray-600 mt-2 text-center">
     {dataFetchMode === 'point'
       ? 'Click on map to select a single point'
       : 'Draw a shape to define area of interest'}
   </p>
 </div>
-        {/* ✅ LOADING STATE */}
-        {loadingAOIs && (
-          <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
-            📦 Loading saved Orchards...
-          </div>
-        )}
-
-        {/* ✅ SAVED AOIS COUNT */}
-        {savedAOIs.length > 0 && (
-          <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
-            ✅ {savedAOIs.length} saved AOI(s) loaded from database
-          </div>
-        )}
-
-        {/* SINGLE POINT MODE */}
-        {dataFetchMode === 'point' && (
-          <div className="border-t pt-3">
-            <span className="text-xs font-semibold block mb-2">Current Location</span>
-            <div className="bg-white p-2 rounded text-xs space-y-1 border border-gray-200">
-              <div><span className="text-gray-600">Latitude:</span> <span className="font-mono">{lat.toFixed(6)}</span></div>
-              <div><span className="text-gray-600">Longitude:</span> <span className="font-mono">{lon.toFixed(6)}</span></div>
-            </div>
-          </div>
-        )}
+       
 
         {/* BOUNDARY/AOI MODE */}
         {dataFetchMode === 'boundary' && (
           <div className="border-t pt-3">
-            {/* Move Drawing Tools ABOVE Saved Boundaries Section */}
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold">Drawing Tools (AOI)</span>
+            {/* Drawing Tools Section - Centered */}
+            <div className="flex flex-col items-center mb-2">
+              <span className="text-xs font-semibold text-center mb-2">Drawing Tools (AOI)</span>
               {(drawnGeoJSON.length > 0 || savedAOIs.length > 0) && (
                 <div className="flex gap-2">
                   <button
                     onClick={clearAllDrawings}
-                    className="text-[11px] px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100"
+                    className="text-[15px] px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 flex items-center justify-center"
+                    title="Clear All"
                   >
-                    Clear All ({savedAOIs.length} saved)
+                    <span role="img" aria-label="Trash">🗑️</span>
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-2 mb-2">
-              <button
-                onClick={() => {
-                  if (drawingMode === 'line') {
-                    cancelDrawing();
-                  } else {
-                    setDrawingMode('line');
-                    drawingModeRef.current = 'line';
-                    setCurrentDrawing([]);
-                  }
-                }}
-                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  drawingMode === 'line'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+    <div className="flex gap-2 mb-2">
+      <button
+        onClick={() => {
+          if (drawingMode === 'line') {
+            cancelDrawing();
+          } else {
+            setDrawingMode('line');
+            drawingModeRef.current = 'line';
+            setCurrentDrawing([]);
+          }
+        }}
+        className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+          drawingMode === 'line'
+            ? 'bg-blue-500 text-white'
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+        }`}
+        style={{ minWidth: 0 }}
+      >
+        {drawingMode === 'line' ? '✓ Line' : 'Line'}
+      </button>
+
+      <button
+        onClick={() => {
+          if (drawingMode === 'polygon') {
+            cancelDrawing();
+          } else {
+            setDrawingMode('polygon');
+            drawingModeRef.current = 'polygon';
+            setCurrentDrawing([]);
+          }
+        }}
+        className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+          drawingMode === 'polygon'
+            ? 'bg-blue-500 text-white'
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+        }`}
+        style={{ minWidth: 0 }}
+      >
+        {drawingMode === 'polygon' ? '✓ Polygon' : 'Polygon'}
+      </button>
+
+      <button
+        onClick={() => {
+          if (drawingMode === 'rectangle') {
+            cancelDrawing();
+          } else {
+            setDrawingMode('rectangle');
+            drawingModeRef.current = 'rectangle';
+            setCurrentDrawing([]);
+          }
+        }}
+        className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+          drawingMode === 'rectangle'
+            ? 'bg-blue-500 text-white'
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+        }`}
+        style={{ minWidth: 0 }}
+      >
+        {drawingMode === 'rectangle' ? '✓ Rectangle' : 'Rectangle'}
+      </button>
+    </div>
+
+    {drawingMode !== 'none' && (drawingMode === 'line' || drawingMode === 'polygon') && (
+      <div className="flex gap-2 mb-2">
+        <button
+          onClick={finishDrawing}
+          disabled={
+            (drawingMode === 'line' && currentDrawing.length < 2) ||
+            (drawingMode === 'polygon' && currentDrawing.length < 3)
+          }
+          className="flex-1 px-3 py-2 bg-green-500 text-white rounded text-sm font-medium hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Save Orchard 
+        </button>
+        <button
+          onClick={cancelDrawing}
+          className="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm font-medium hover:bg-red-600"
+        >
+          Cancel
+        </button>
+      </div>
+    )}
+
+    {currentDrawing.length > 0 && (
+      <div className="mb-2 text-xs text-gray-600 bg-blue-50 p-2 rounded">
+        📍 Points: {currentDrawing.length}
+        {drawingMode === 'line' && currentDrawing.length < 2 && ' (need 2+)'}
+        {drawingMode === 'polygon' && currentDrawing.length < 3 && ' (need 3+)'
+        }
+      </div>
+    )}
+
+    {/* Saved Boundaries Section */}
+    {savedAOIs.length > 0 && (
+      <div className="mb-4">
+        <div className="text-xs font-semibold mb-2 flex items-center justify-center">
+          <span className="text-center w-full">📍 Saved Orchards ({savedAOIs.length})</span>
+        </div>
+        <div className="max-h-32 overflow-y-auto space-y-1 mb-3">
+          {savedAOIs.map((aoi) => {
+            const measurement = calculateMeasurement(aoi.geojson);
+            const climate = aoiClimateData[aoi.id];
+            return (
+              <div
+                key={aoi.id}
+                className={`flex items-center gap-2 px-3 py-2 rounded text-xs transition-all ${
+                  selectedBoundaryId === aoi.id
+                    ? 'bg-green-500 text-white shadow-md'
+                    : 'bg-gray-50 border border-gray-200'
                 }`}
               >
-                {drawingMode === 'line' ? '✓ Line' : 'Line'}
-              </button>
-
-              <button
-                onClick={() => {
-                  if (drawingMode === 'polygon') {
-                    cancelDrawing();
-                  } else {
-                    setDrawingMode('polygon');
-                    drawingModeRef.current = 'polygon';
-                    setCurrentDrawing([]);
-                  }
-                }}
-                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  drawingMode === 'polygon'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {drawingMode === 'polygon' ? '✓ Polygon' : 'Polygon'}
-              </button>
-
-              <button
-                onClick={() => {
-                  if (drawingMode === 'rectangle') {
-                    cancelDrawing();
-                  } else {
-                    setDrawingMode('rectangle');
-                    drawingModeRef.current = 'rectangle';
-                    setCurrentDrawing([]);
-                  }
-                }}
-                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  drawingMode === 'rectangle'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {drawingMode === 'rectangle' ? '✓ Rectangle' : 'Rectangle'}
-              </button>
-            </div>
-
-            {drawingMode !== 'none' && (drawingMode === 'line' || drawingMode === 'polygon') && (
-              <div className="flex gap-2 mb-2">
                 <button
-                  onClick={finishDrawing}
-                  disabled={
-                    (drawingMode === 'line' && currentDrawing.length < 2) ||
-                    (drawingMode === 'polygon' && currentDrawing.length < 3)
-                  }
-                  className="flex-1 px-3 py-2 bg-green-500 text-white rounded text-sm font-medium hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  onClick={() => loadSavedBoundary(aoi)}
+                  className="flex-1 text-left"
                 >
-                  Save Orchard 
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{aoi.name || 'Unnamed Boundary'}</span>
+                    <span className="text-[10px] opacity-75">
+                      {aoi.geojson.geometry.type}
+                    </span>
+                  </div>
+                  <div className="text-[10px] opacity-75 mt-0.5 flex items-center gap-2">
+                    {measurement.type === 'area' && measurement.area && (
+                      <span>📐 {measurement.area.acres.toFixed(2)} ac</span>
+                    )}
+                    <span>📅 {new Date(aoi.created_at).toLocaleDateString()}</span>
+                  </div>
+                  {climate && (
+                    <div className="text-[10px] opacity-90 mt-1 flex items-center gap-3">
+                      <span>🌡️ {formatClimate(climate.temperature, '°C')}</span>
+                      <span>💨 {formatClimate(climate.windSpeed, ' m/s')}</span>
+                      <span>🌧️ {formatClimate(climate.rainfall, ' mm')}</span>
+                    </div>
+                  )}
                 </button>
                 <button
-                  onClick={cancelDrawing}
-                  className="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm font-medium hover:bg-red-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    renameBoundary(aoi.id, aoi.name || 'Unnamed Boundary');
+                  }}
+                  className={`px-2 py-1 rounded hover:bg-opacity-80 transition-colors ${
+                    selectedBoundaryId === aoi.id
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                  title="Rename boundary"
                 >
-                  Cancel
+                  ✏️
                 </button>
               </div>
-            )}
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
+)}
+{recommendedLayers && recommendedLayers.length > 0 && (
+  <div className="mb-0 flex flex-col items-center">
+    <div className="text-xs font-semibold text-gray-700 mb-3 text-center">
+      🧪 Recommended Layers
+    </div>
+    <div className="flex flex-wrap gap-2 justify-center">
+      {recommendedLayers.map((layer) => (
+        <button
+          key={layer}
+          onClick={() => toggleLayer(layer)}
+          className="px-2 py-1 text-[11px] rounded-full border font-medium transition-all
+            bg-white text-gray-800 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+          style={{ minWidth: 0 }}
+        >
+          {layer}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+        {/* LAYERS SECTION - COLLAPSIBLE */}
+{(() => {
+  const [showLayers, setShowLayers] = useState(false); // local state for collapse
 
-            {currentDrawing.length > 0 && (
-              <div className="mb-2 text-xs text-gray-600 bg-blue-50 p-2 rounded">
-                📍 Points: {currentDrawing.length}
-                {drawingMode === 'line' && currentDrawing.length < 2 && ' (need 2+)'}
-                {drawingMode === 'polygon' && currentDrawing.length < 3 && ' (need 3+)'
-                }
-              </div>
-            )}
+  // You can move this useState to the top of your component if you want to avoid re-creating it on every render.
 
-            {/* Saved Boundaries Section */}
-            {savedAOIs.length > 0 && (
-              <div className="mb-4">
-                <div className="text-xs font-semibold mb-2 flex items-center justify-between">
-                  <span>📍 Saved Orchards ({savedAOIs.length})</span>
-                </div>
-                <div className="max-h-32 overflow-y-auto space-y-1 mb-3">
-                  {savedAOIs.map((aoi) => {
-                    const measurement = calculateMeasurement(aoi.geojson);
-                    const climate = aoiClimateData[aoi.id];
-                    return (
-                      <div
-                        key={aoi.id}
-                        className={`flex items-center gap-2 px-3 py-2 rounded text-xs transition-all ${
-                          selectedBoundaryId === aoi.id
-                            ? 'bg-green-500 text-white shadow-md'
-                            : 'bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        <button
-                          onClick={() => loadSavedBoundary(aoi)}
-                          className="flex-1 text-left"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">{aoi.name || 'Unnamed Boundary'}</span>
-                            <span className="text-[10px] opacity-75">
-                              {aoi.geojson.geometry.type}
-                            </span>
-                          </div>
-                          <div className="text-[10px] opacity-75 mt-0.5 flex items-center gap-2">
-                            {measurement.type === 'area' && measurement.area && (
-                              <span>📐 {measurement.area.acres.toFixed(2)} ac</span>
-                            )}
-                            <span>📅 {new Date(aoi.created_at).toLocaleDateString()}</span>
-                          </div>
-                          {climate && (
-                            <div className="text-[10px] opacity-90 mt-1 flex items-center gap-3">
-                              <span>🌡️ {formatClimate(climate.temperature, '°C')}</span>
-                              <span>💨 {formatClimate(climate.windSpeed, ' m/s')}</span>
-                              <span>🌧️ {formatClimate(climate.rainfall, ' mm')}</span>
-                            </div>
-                          )}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            renameBoundary(aoi.id, aoi.name || 'Unnamed Boundary');
-                          }}
-                          className={`px-2 py-1 rounded hover:bg-opacity-80 transition-colors ${
-                            selectedBoundaryId === aoi.id
-                              ? 'bg-green-600 text-white'
-                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                          title="Rename boundary"
-                        >
-                          ✏️
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* LAYERS SECTION - ALWAYS VISIBLE */}
+  return (
+    <div>
+      <button
+        className="w-full flex items-center justify-center text-xs font-semibold p-2 bg-gray-100 hover:bg-gray-200 rounded transition-all mb-2"
+        onClick={() => setShowLayers((v) => !v)}
+      >
+        <span> Other-Layers</span>
+        <span className={`ml-2 transform transition-transform ${showLayers ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+      {showLayers && (
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold">Layers</span>
-          </div>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-2 max-h-56 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-1">
             {Object.entries(LAYER_GROUPS).map(([groupName, layers]) => (
               <div key={groupName} className="border-b border-gray-200 pb-2 last:border-b-0">
                 <div className="flex items-center">
@@ -1751,7 +1765,6 @@ export const PlanetMapViewer: React.FC<Props> = ({
                   >
                     <span>{groupName}</span>
                     <span className="flex items-center gap-1">
-                      {/* Info button on the right, but left of down arrow */}
                       <button
                         type="button"
                         className="text-black-500 hover:text-black-700 text-xs px-1"
@@ -1769,7 +1782,6 @@ export const PlanetMapViewer: React.FC<Props> = ({
                     </span>
                   </button>
                 </div>
-                {/* Info for all layers in group */}
                 {expandedLayer === groupName && (
                   <div className="bg-white border border-blue-300 rounded shadow-lg p-2 text-[11px] mt-2">
                     <div className="font-semibold text-blue-700 mb-1">{groupName} Layers</div>
@@ -1791,7 +1803,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
                   </div>
                 )}
                 {expandedGroup === groupName && (
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-2 justify-center">
                     {layers.map((id) => (
                       <button
                         key={id}
@@ -1814,6 +1826,10 @@ export const PlanetMapViewer: React.FC<Props> = ({
             ))}
           </div>
         </div>
+      )}
+    </div>
+  );
+})()}
 
         {/* DATE RANGE & BUTTONS */}
         <div className="flex flex-wrap items-center gap-3 text-xs">
@@ -1836,6 +1852,7 @@ export const PlanetMapViewer: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <button onClick={handleLive} className="bg-green-600 text-white px-3 py-1 rounded text-xs">
               Live
+
             </button>
             <button
               onClick={() => {
