@@ -832,56 +832,67 @@ export const PlanetMapViewer: React.FC<Props> = ({
   };
 
   const friendlyName = (id: string) =>
-    id === '3_NDVI-L1C'
-      ? 'NDVI'
-      : id === 'EVI'
-      ? 'EVI'
-      : id === 'MOISTURE-INDEX' || id === '5_MOISTURE-INDEX-L1C'
-      ? 'Moisture'
-      : id === '7_NDWI-L1C'
-      ? 'Water index'
-      : id === '8_NDSI-L1C'
-      ? 'Snow index'
-      : id === '1_TRUE-COLOR-L1C'
-      ? 'True color'
-      : id === '2_FALSE-COLOR-L1C'
-      ? 'False color'
-      : id === '4_FALSE-COLOR-URBAN-L1C'
-      ? 'Urban'
-      : id === '2_TONEMAPPED-NATURAL-COLOR-L1C'
-      ? 'Natural color'
-      : id === '6_SWIR-L1C'
-      ? 'SWIR'
-      : id === 'OSAVI' ? 'OSAVI'
-      : id === 'PSRI' ? 'PSRI'
-      : id === 'ExG' ? 'ExG'
-      : id === 'VARI' ? 'VARI'
-      : id === 'GNDVI' ? 'GNDVI'
-      : id === 'NDMI' ? 'NDMI'
-      : id === 'SAVI' ? 'SAVI'
-      : id === 'NDWI' ? 'NDWI'
-      : id === 'LSWI' ? 'LSWI'
-      : id === 'NGRDI' ? 'NGRDI'
-      : id === 'CIGREEN' ? 'CIGREEN'
-      : id === 'GLI' ? 'GLI'
-      : id === 'NDRE' ? 'NDRE'
-      : id === 'MSAVI' ? 'MSAVI'
-      : id === 'DVI' ? 'DVI'
-      : id === 'RVI' ? 'RVI'
-      : id === 'IPVI' ? 'IPVI'
-      : id === 'NDGI' ? 'NDGI'
-      : id === 'RENDVI' ? 'RENDVI'
-      : id === 'MCARI' ? 'MCARI'
-      : id === 'MTCI' ? 'MTCI'
-      : id === 'TCARI' ? 'TCARI'
-      : id === 'TSAVI' ? 'TSAVI'
-      : id === 'WDVI' ? 'WDVI'
-      : id === 'PVI' ? 'PVI'
-      : id === 'TVI' ? 'TVI'
-      : id === 'VIGREEN' ? 'VIGREEN'
-      : id === 'SIPI' ? 'SIPI'
-      : id === 'WBI' ? 'WBI'
-      : id;
+  id === '3_NDVI-L1C' ? 'NDVI'
+  : id === 'EVI' ? 'EVI'
+  : id === 'MOISTURE-INDEX' || id === '5_MOISTURE-INDEX-L1C' ? 'Moisture'
+  : id === '7_NDWI-L1C' ? 'Water index'
+  : id === '8_NDSI-L1C' ? 'Snow index'
+  : id === '1_TRUE-COLOR-L1C' ? 'True color'
+  : id === '2_FALSE-COLOR-L1C' ? 'False color'
+  : id === '4_FALSE-COLOR-URBAN-L1C' ? 'Urban'
+  : id === '2_TONEMAPPED-NATURAL-COLOR-L1C' ? 'Natural color'
+  : id === '6_SWIR-L1C' ? 'SWIR'
+  : id === 'OSAVI' ? 'OSAVI'
+  : id === 'PSRI' ? 'PSRI'
+  : id === 'EXG' ? 'EXG'
+  : id === 'EXR' ? 'EXR'
+  : id === 'VARI' ? 'VARI'
+  : id === 'GNDVI' ? 'GNDVI'
+  : id === 'NDMI' ? 'NDMI'
+  : id === 'SAVI' ? 'SAVI'
+  : id === 'NDWI' ? 'NDWI'
+  : id === 'LSWI' ? 'LSWI'
+  : id === 'NGRDI' ? 'NGRDI'
+  : id === 'CIGREEN' ? 'CIGREEN'
+  : id === 'GLI' ? 'GLI'
+  : id === 'NDRE' ? 'NDRE'
+  : id === 'MSAVI' ? 'MSAVI'
+  : id === 'DVI' ? 'DVI'
+  : id === 'RVI' ? 'RVI'
+  : id === 'IPVI' ? 'IPVI'
+  : id === 'NDGI' ? 'NDGI'
+  : id === 'RENDVI' ? 'RENDVI'
+  : id === 'MCARI' ? 'MCARI'
+  : id === 'MTCI' ? 'MTCI'
+  : id === 'TCARI' ? 'TCARI'
+  : id === 'TSAVI' ? 'TSAVI'
+  : id === 'WDVI' ? 'WDVI'
+  : id === 'PVI' ? 'PVI'
+  : id === 'TVI' ? 'TVI'
+  : id === 'VIGREEN' ? 'VIGREEN'
+  : id === 'SIPI' ? 'SIPI'
+  : id === 'WBI' ? 'WBI'
+  // Add new/phase 2 layers below:
+  : id === 'NDMI-NDVI' ? 'NDMI-NDVI'
+  : id === 'GNDVI-NDRE' ? 'GNDVI-NDRE'
+  : id === 'LSWI-PSRI' ? 'LSWI-PSRI'
+  : id === 'NDWI-NDVI' ? 'NDWI-NDVI'
+  : id === 'NDMI-SIPI' ? 'NDMI-SIPI'
+  : id === 'SIPI-PSRI' ? 'SIPI-PSRI'
+  : id;
+
+  // Add this helper inside your component, above the return:
+  const friendlyToId = (nameOrId: string) => {
+    // If it's already an ID, just return it
+    if (LAYER_IDS.includes(nameOrId)) return nameOrId;
+    // Normalize for case-insensitive matching
+    const n = nameOrId.trim().toLowerCase();
+    if (n === 'true color') return '1_TRUE-COLOR-L1C';
+    if (n === 'ndvi') return '3_NDVI-L1C';
+    if (n === 'moisture') return 'MOISTURE-INDEX';
+    // Add more mappings as needed
+    return nameOrId;
+  };
 
   const sendAOIToBackend = async (aoiGeoJSON: AOIGeoJSON): Promise<any> => {
     const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/planet-aoi`, {
@@ -1724,17 +1735,20 @@ export const PlanetMapViewer: React.FC<Props> = ({
       🧪 Recommended Layers
     </div>
     <div className="flex flex-wrap gap-2 justify-center">
-      {recommendedLayers.map((layer) => (
-        <button
-          key={layer}
-          onClick={() => toggleLayer(layer)}
-          className="px-2 py-1 text-[11px] rounded-full border font-medium transition-all
-            bg-white text-gray-800 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-          style={{ minWidth: 0 }}
-        >
-          {layer}
-        </button>
-      ))}
+      {recommendedLayers.map((layer) => {
+        const id = friendlyToId(layer);
+        return (
+          <button
+            key={id}
+            onClick={() => toggleLayer(id)}
+            className="px-2 py-1 text-[11px] rounded-full border font-medium transition-all
+              bg-white text-gray-800 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+            style={{ minWidth: 0 }}
+          >
+            {friendlyName(id)}
+          </button>
+        );
+      })}
     </div>
   </div>
 )}
@@ -1812,8 +1826,9 @@ export const PlanetMapViewer: React.FC<Props> = ({
                           toggleLayer(id);
                         }}
                         className={`px-2 py-1 text-[10px] rounded-full border ${
+                         
                           activeLayers[id]
-                            ? 'bg-blue-600 text-white border-blue-600'
+                                                       ? 'bg-blue-600 text-white border-blue-600'
                             : 'bg-white text-gray-800 border-gray-300 hover:border-gray-400'
                         }`}
                       >
