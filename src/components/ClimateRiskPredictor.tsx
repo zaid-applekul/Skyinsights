@@ -1568,7 +1568,7 @@ y = 50; // move below logo
           <PlanetMapViewer
             initialLat={viewParams.latitude ?? 34.1}
             initialLon={viewParams.longitude ?? 74.8}
-            configId="0dc5fcdc-69e2-4789-8511-6b0cc7efbff3"
+            configId="e4a82625-691f-45ad-bfcf-557f1e5fbf8e"
             onAutoFill={handlePlanetAutoFill}
             recommendedLayers={
               results.length > 0
